@@ -215,7 +215,8 @@ let plSetupHolder = function () {
             },
             "y_state":{
                 range: [0, 100],
-                fixedrange: true
+                fixedrange: true,
+                autorange: false,
             }
         };
 
@@ -280,7 +281,8 @@ let plSetupHolder = function () {
                 hoverformat: '.2f',
                 hoverinfo: 'y+name',
                 spikethickness:1,
-                showspikes:false
+                showspikes:false,
+                autorange: true,
             };
             let title = {
                 xref: 'paper',
@@ -342,8 +344,8 @@ let plotly_handler = function (plotid,setup_instance) {
             let currentQueue = [];
             let currentRun = false;
 
-            let addToQueue = function (functionName,params) {
-                currentQueue.push([functionName,params]);
+            let addToQueue = function (functionName,params,thenFunc) {
+                currentQueue.push([functionName,params,thenFunc]);
                 if(currentRun === false){
                     checkQueue();
                 }
@@ -357,9 +359,15 @@ let plotly_handler = function (plotid,setup_instance) {
                     var isPromise = result !== undefined && typeof result.then == 'function';
                     if(isPromise){
                         result.then(function () {
+                            if(next[2] !== undefined && typeof next[2] === "function"){
+                                next[2]();
+                            }
                             checkQueue();
                         });
                     } else {
+                        if(next[2] !== undefined && typeof next[2] === "function"){
+                            next[2]();
+                        }
                         checkQueue();
                     }
                 } else {
@@ -524,12 +532,40 @@ let plotly_handler = function (plotid,setup_instance) {
             plot_elements_state.datasetColors[col] = false;
         };
 
+        let getRangeAsDate = function (range) {
+            let startDateTime = range[0];
+            let endDateTime = range[1];
+            if(typeof startDateTime === "string"){
+                startDateTime = new Date(startDateTime);
+            }
+            if(typeof endDateTime === "string"){
+                endDateTime = new Date(endDateTime);
+            }
+            return [startDateTime,endDateTime];
+        };
+
+        let setButtonStateByColor = function (dataState,color,code) {
+            if(color !== null){
+                dataState.visible = true;
+                dataState.color = color;
+                dataState.htmlelement.style.backgroundColor = color;
+                plot_elements_state.activeCodes[code] = true;
+                dataState.htmlelement.classList.add("active");
+            } else {
+                dataState.visible = false;
+                delete plot_elements_state.activeCodes[code];
+                dataState.htmlelement.classList.remove("active");
+            }
+        };
+
         return {
             queue:actionPromiseQueue,
             dataFormatters,dataFormatters,
             ajax:ajax,
             findNewButtonColor:findNewButtonColor,
-            releaseButtonColor:releaseButtonColor
+            releaseButtonColor:releaseButtonColor,
+            getRangeAsDate:getRangeAsDate,
+            setButtonStateByColor:setButtonStateByColor
         }
     })();
 
@@ -551,7 +587,9 @@ let plotly_handler = function (plotid,setup_instance) {
         datasetColors:{},
         pendingSetup: [],
         unit_to_axes:{},
-        timeformat: 'unix'
+        timeformat: 'unix',
+        activeCodes: {},
+        modebar:{}
     };
 
     let createPlot = function(containers){
@@ -594,6 +632,8 @@ let plotly_handler = function (plotid,setup_instance) {
 
         Plotly.newPlot(plotElems[0], [], initialLayout[0]).then(function (p) {
             plot_elements_state.plot = p;
+            interactions.registerPlotRelayoutCallback();
+            plot_elements_state.modebar = p.querySelector(".modebar-container");
         });
 
         for(let c in setup_instance.setupValues.defaultChartColors){
@@ -632,7 +672,7 @@ let plotly_handler = function (plotid,setup_instance) {
         };
 
 
-        var appendStateDataToPlot = function (k,onoff) {
+        var appendStateDataToPlot = function (k,onoff,mode) {
 
             let cAnnots = plot_elements_state.shapeGroups[k];
             let annot = null;
@@ -646,21 +686,25 @@ let plotly_handler = function (plotid,setup_instance) {
             let newAnnots = [];
 
             let dataState = plot_elements_state.elems[k];
-
+            if(onoff.length>0){
+                onoff[0][0] = new Date(onoff[0][0]*1000);
+            }
             for(let i=0;i<onoff.length;i++){
                 let num = parseInt(onoff[i][1]);
-                onoff[i][0] = new Date(onoff[i][0]*1000);
                 let opacity = dataState.opacityMap[num];
                 if(opacity === undefined) opacity = 0.04 + (num * 0.12);
 
                 let xMin = 0;
                 let xMax = null;
                 if (onoff[i][0] !== 0) xMin = onoff[i][0];
-                if (onoff[i + 1] !== undefined && onoff[i + 1][0] !== 0) xMax = onoff[i + 1][0];
+                if (onoff[i + 1] !== undefined && onoff[i + 1][0] !== 0) {
+                    onoff[i + 1][0] = new Date(onoff[i+1][0]*1000);
+                    xMax = onoff[i + 1][0];
+                }
                 else xMax = plot_elements_state.plot.layout.xaxis.range[1];
 
                 let addAnnot = true;
-                if(onoff[i + 1]===undefined && annot !== null){
+                if(mode === "prepend" && onoff[i + 1]===undefined && annot !== null){
                     if(annot.opacity===opacity){
                         addAnnot=false;
                         annot.x0 = xMin;
@@ -686,9 +730,17 @@ let plotly_handler = function (plotid,setup_instance) {
                 };
                 if(addAnnot)newAnnots.push(newannot);
             }
-            for(let n=newAnnots.length-1;n>=0;n--){
-                plot_elements_state.plot.shapes.push(newAnnots[n]);
-                plot_elements_state.shapeGroups[k].unshift(newAnnots[n]);
+            if(mode === "prepend"){
+                for(let n=newAnnots.length-1;n>=0;n--){
+                    plot_elements_state.plot.layout.shapes.push(newAnnots[n]);
+                    plot_elements_state.shapeGroups[k].unshift(newAnnots[n]);
+                }
+            }
+            if(mode === "append"){
+                for(let n=0;n<newAnnots.length;n++){
+                    plot_elements_state.plot.layout.shapes.push(newAnnots[n]);
+                    plot_elements_state.shapeGroups[k].unshift(newAnnots[n]);
+                }
             }
         };
 
@@ -707,8 +759,7 @@ let plotly_handler = function (plotid,setup_instance) {
                         } else if (onoff.length > 0) {
                             color = helpers.findNewButtonColor();
                         }
-                        dataState.color = color;
-                        dataState.htmlelement.style.backgroundColor = color;
+                        helpers.setButtonStateByColor(dataState,color,k);
                     }
                     if(onoff.length>0){
                         onoff[0][0] = new Date(onoff[0][0]*1000);
@@ -766,26 +817,27 @@ let plotly_handler = function (plotid,setup_instance) {
 
         return new Promise((resolve, reject) => {
             let composeRequestBody = function (codes) {
-                let range = plot_elements_state.plot.layout.xaxis.range;
 
-                let startDateTime = range[0];
-                let endDateTime = range[1];
+                let [startDateTime,endDateTime] = helpers.getRangeAsDate(plot_elements_state.plot.layout.xaxis.range);
 
                 let startTime = parseInt(startDateTime.getTime() / 1000);
                 let endTime = parseInt(endDateTime.getTime() / 1000);
 
                 let rParams = {'codes':{}};
-
                 for (let c in codes) {
                     let cd = codes[c];
                     let state = plot_elements_state.elems[cd];
                     let start = startTime;
                     let end = endTime;
-                    if (state.dataset !== undefined && state.dataset !== null && state.dataset.x.length>0) {
-                        let first = state.dataset.x[0];
+
+                    if (state.index !== undefined && state.index !== null && state.index.length>0) {
+                        let dataset = plot_elements_state.plot.data[state.index[0]];
+                        let first = dataset.x[0];
                         first = parseInt(first.getTime() / 1000);
                         end = first;
-
+                    } else if(plot_elements_state.shapeGroups[cd] !== undefined && plot_elements_state.shapeGroups[cd].length>0){
+                        let elem = plot_elements_state.shapeGroups[cd][0];
+                        end = parseInt(elem.x0 / 1000);
                     }
                     if(start >= end) continue;
                     if(state.group !== undefined){
@@ -859,7 +911,6 @@ let plotly_handler = function (plotid,setup_instance) {
                 let  codesByType = [{},{}];
                 for(let cat in responseData){
                     for(let code in responseData[cat]){
-                        let values = [];
                         let formatters = [];
                         let state = plot_elements_state.elems[code];
                         let valObj = {
@@ -892,9 +943,10 @@ let plotly_handler = function (plotid,setup_instance) {
                                     console.warn(code+': Time format after data formatters is not correct. Expected unix timestamp format');
                                     continue;
                                 }
-                                if(state.dataset !== undefined){
-                                    let newTo = valObj.values[valObj.values.length-1][0];
-                                    let currentData = state.dataset.x;
+                                let newTo = valObj.values[valObj.values.length-1][0];
+                                if(state.index !== undefined){
+                                    let dataset = plot_elements_state.plot.data[state.index[0]];
+                                    let currentData = dataset.x;
                                     let len = currentData.length;
                                     if(len > 0){
                                         let existingFrom = currentData[0];
@@ -910,7 +962,22 @@ let plotly_handler = function (plotid,setup_instance) {
                                             }
                                         }
                                     }
-
+                                } else if(plot_elements_state.shapeGroups[code] !== undefined){
+                                    let len = plot_elements_state.shapeGroups[code].length;
+                                    if(len > 0){
+                                        let existingFrom = plot_elements_state.shapeGroups[code][0].x0;
+                                        let existingTo   = plot_elements_state.shapeGroups[code][len-1].x1;
+                                        if(existingFrom>newFrom){
+                                            valObj.mode = "prepend";
+                                            if(newTo > existingFrom){
+                                                cutDataFromEnd(valObj.values,existingFrom)
+                                            }
+                                        } else {
+                                            if(newFrom < existingTo){
+                                                cutDataFromBeginning(valObj.values,existingTo)
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -980,9 +1047,12 @@ let plotly_handler = function (plotid,setup_instance) {
                 }
             }
             if(mode === "append"){
-                if(plotState.dataset!==undefined && plotState.dataset.x.length>0){
-                    dt =  plotState.dataset.x[ plotState.dataset.x.length-1];
-                    prev = plotState.dataset.y[ plotState.dataset.y.length-1];
+                if(plotState.index!==undefined){
+                    let dataset = plot_elements_state.plot.data[plotState.index[0]];
+                    if(dataset.length>0){
+                        dt =  dataset.x[dataset.x.length-1];
+                        prev = dataset.y[dataset.y.length-1];
+                    }
                 }
                 d=0;
             }
@@ -1003,7 +1073,7 @@ let plotly_handler = function (plotid,setup_instance) {
                 dt = curdt;
             }
             if(mode === "prepend") {
-                if (plotState.dataset !== undefined && plotState.firstvalue !== undefined) {
+                if (plotState.index !== undefined && plotState.firstvalue !== undefined) {
                     let fv = plotState.firstvalue;
                     let timediff = fv[0] - dt;
                     if (timediff <= normTresholdMax && timediff >= normTreshold) {
@@ -1054,8 +1124,9 @@ let plotly_handler = function (plotid,setup_instance) {
     var toggleDatasetVisibility = function(visible,code,color){
         let dataState = plot_elements_state.elems[code];
         if(color !== undefined){
-            dataState.dataset.line.color = color;
-            dataState.dataset.marker.color = color;
+            let dataset = plot_elements_state.plot.data[dataState.index[0]];
+            dataset.line.color = color;
+            dataset.marker.color = color;
         }
         Plotly.restyle(plot_elements_state.plot,'visible',visible,dataState.index);
     };
@@ -1133,7 +1204,7 @@ let plotly_handler = function (plotid,setup_instance) {
                 var datasets = [];
 
                 for(let key in storeData){
-                    if(plot_elements_state.elems[key] !== undefined && plot_elements_state.elems[key].dataset !== undefined) continue;
+                    if(plot_elements_state.elems[key] !== undefined && plot_elements_state.elems[key].index !== undefined) continue;
                     let plotState = plot_elements_state.elems[key];
                     var color = plotState.fixedcolor;
                     var yA = plotState.yaxis;
@@ -1146,12 +1217,12 @@ let plotly_handler = function (plotid,setup_instance) {
                         if (color === null || color === "" || color === undefined) {
                             color = helpers.findNewButtonColor();
                         }
-                        plot_elements_state.axes.axisActiveCount[yA]++;
-                        plotState.color = color;
+                        helpers.setButtonStateByColor(plotState,color,key);
+                        if(plotState.visible) plot_elements_state.axes.axisActiveCount[yA]++;
                     }
-                    let btn = plotState.htmlelement;
 
                     if(plotState.groupnorm !== null){
+                        let btn = plotState.htmlelement;
                         let legend = plotState.legend;
                         let colors = [];
                         if(legend !== undefined){
@@ -1167,7 +1238,6 @@ let plotly_handler = function (plotid,setup_instance) {
                         }
                         btn.setAttribute("bck-col",colors);
 
-                        plotState.dataset = new Array(legend.length);
                         for (let i=0;i<legend.length;i++){
                             var dataset = {
                                 id: key+"_"+i,
@@ -1194,10 +1264,8 @@ let plotly_handler = function (plotid,setup_instance) {
                             };
                             dataset.groupnorm = plotState.groupnorm;
                             datasets.push(dataset);
-                            plotState.dataset[i] = dataset;
                         }
                     } else {
-                        btn.style.backgroundColor = color;
                         var dataset = {
                             id: key,
                             visible: plotState.visible,
@@ -1233,7 +1301,6 @@ let plotly_handler = function (plotid,setup_instance) {
                             if(layout.updatemenus === undefined) layout.updatemenus = updateMenus;
                         }
                         datasets.push(dataset);
-                        plotState.dataset = dataset;
                     }
 
                 }
@@ -1262,8 +1329,8 @@ let plotly_handler = function (plotid,setup_instance) {
                 let storeData = pres[0];
                 let states     = pres[1];
                 let joinTraces = {
-                    append:[[],[],[]],
-                    prepend:[[],[],[]],
+                    append:[[],[],[],[]],
+                    prepend:[[],[],[],[]],
                 };
                 for(let key in storeData){
                     let plotState = plot_elements_state.elems[key];
@@ -1286,6 +1353,10 @@ let plotly_handler = function (plotid,setup_instance) {
                 if(joinTraces.prepend[0].length>0){
                     Plotly.prependTraces(plot_elements_state.plot,{y: joinTraces.prepend[1],x:joinTraces.prepend[0]},joinTraces.prepend[2])
                 }
+                for(let s in states){
+                    plotAnnotations.appendStateDataToPlot(s,states[s].values,states[s].mode)
+                }
+                resolve();
             });
         });
     };
@@ -1332,6 +1403,7 @@ let plotly_handler = function (plotid,setup_instance) {
     var interactions = (function () {
         let doPlotButtonClick = function () {
             let code = this.getAttribute("pl-code");
+            console.log('click');
             let plotState = plot_elements_state.elems[code];
             if(plotState.visible){
                 if(plotState.yaxis === "y_state" || plotState.isState === true){
@@ -1341,27 +1413,33 @@ let plotly_handler = function (plotid,setup_instance) {
 
                 }
                 helpers.releaseButtonColor(plotState.color);
+                delete plot_elements_state.activeCodes[code];
+                plot_elements_state.axes.axisActiveCount[plotState.yaxis]--;
                 plotState.htmlelement.style.backgroundColor = "transparent";
                 plotState.htmlelement.classList.remove("active");
                 plotState.visible = false;
+                setActiveAxes();
+                Plotly.redraw(plot_elements_state.plot);
             } else {
-                plotState.htmlelement.classList.add("active");
-                plotState.visible = true;
                 let color = plotState.fixedColor;
                 if(color === undefined || color === null){
                     color = helpers.findNewButtonColor(plotState.color);
                 }
-                plotState.htmlelement.style.backgroundColor = color;
-                plotState.color = color;
+                helpers.setButtonStateByColor(plotState,color,code);
+                if (plotState.visible === false) return;
+                plot_elements_state.axes.axisActiveCount[plotState.yaxis]++;
                 if(plotState.yaxis === "y_state" || plotState.isState === true){
-
                     plotAnnotations.toggleStateAnnotations(true,code,color);
                 } else {
                     toggleDatasetVisibility(true,code,color);
+                    setActiveAxes();
+                    correctVisibleAxes();
+                    Plotly.redraw(plot_elements_state.plot);
                 }
-                helpers.queue.addToQueue(appendDataToPlot,[[code]]);
+                helpers.queue.addToQueue(appendDataToPlot,[[code]],function () {
+                    Plotly.redraw(plot_elements_state.plot);
+                });
             }
-            Plotly.redraw(plot_elements_state.plot);
         };
 
         let registerButtonClick = function (elem) {
@@ -1370,8 +1448,126 @@ let plotly_handler = function (plotid,setup_instance) {
             });
         };
 
+        var prevXaxisRange = [null,null];
+        let checkDataPullConditions = function (range) {
+            if(prevXaxisRange === null){
+                prevXaxisRange = range;
+                return true;
+            }
+            let pullData = false;
+            if(prevXaxisRange[0] > range[0]) pullData = true;
+            if(prevXaxisRange[1] < range[1]) pullData = true;
+            prevXaxisRange = range;
+            return pullData;
+        };
+
+
+        let setXaxisRange = function () {
+            let xRange = helpers.getRangeAsDate(plot_elements_state.plot.layout.xaxis.range);
+            let dataSets = plot_elements_state.plot.data;
+            let allFirst = null;
+            let allLast = null;
+            for(let d in dataSets){
+                let len = dataSets[d].x.length;
+                if(len>0){
+                    let first = dataSets[d].x[0];
+                    let last = dataSets[d].x[len-1];
+                    if(allFirst === null || first < allFirst) allFirst = first;
+                    if(allLast === null || last > allLast) allLast = last;
+                }
+            }
+
+            let [startDateTime,endDateTime] = xRange;
+            let updateSlider = false;
+            if(startDateTime < allFirst){
+                plot_elements_state.plot.layout.xaxis.range[0] = allFirst;
+                updateSlider = true;
+            }
+            if(endDateTime > allLast){
+                plot_elements_state.plot.layout.xaxis.range[1] = allLast;
+                updateSlider = true;
+            }
+        };
+
+        let correctVisibleAxes = function () {
+            let cdata = plot_elements_state.plot.calcdata;
+            let exByAxis = {};
+            for(let c=0;c<cdata.length;c++){
+                let trace = cdata[c][0].trace;
+                if(trace.visible == false)continue;
+                let axis = trace.yaxis;
+                let extremes = trace._extremes[axis];
+                let min = extremes.min[0].val;
+                let max = extremes.max[0].val;
+                if(min !== undefined){
+                    if(exByAxis[axis] === undefined){
+                        exByAxis[axis] = [min,max];
+                    } else {
+                        if(exByAxis[axis] [0]>min) exByAxis[axis] [0] = min;
+                        if(exByAxis[axis] [1]<max) exByAxis[axis] [1] = max;
+                    }
+                }
+            }
+            let panMode = false;
+            let pan = plot_elements_state.modebar.querySelector(".modebar-btn[data-val='pan']");
+            if(pan !== null){
+                panMode = pan.classList.contains("active");
+            }
+            for (let ax in exByAxis){
+                let limit = exByAxis[ax];
+                let buffer = (limit[1]-limit[0])*0.05;
+                limit[0] = limit[0]-buffer;
+                limit[1] = limit[1]+buffer;
+                let y = ax.replace("y","");
+                let range = plot_elements_state.plot.layout["yaxis"+y].range;
+                if(panMode){
+                    if(range[0] < limit[0]) {
+                        let diff = range[1]-range[0];
+                        range[0] = limit[0];
+                        range[1] = (limit[0]+diff);
+                    }else if(range[1] > limit[1]) {
+                        let diff = range[1]-range[0];
+                        range[1] = limit[1];
+                        range[0] = (limit[1]-diff);
+                    }
+                } else {
+                    if(range[0] < limit[0]) range[0] = limit[0];
+                    if(range[1] > limit[1]) range[1] = limit[1];
+                }
+                if(range[0] > range[1]) range[1] = range[0]+buffer;
+            }
+        };
+
+        var handlePlotlyRelayout = function(){
+            let xRange = helpers.getRangeAsDate(plot_elements_state.plot.layout.xaxis.range);
+            let shouldPullData = checkDataPullConditions(xRange);
+            if(shouldPullData){
+                helpers.queue.addToQueue(appendDataToPlot,[(Object.keys(plot_elements_state.activeCodes))],function () {
+                    setXaxisRange();
+                    correctVisibleAxes();
+                    Plotly.redraw(plot_elements_state.plot);
+                });
+                return;
+            }
+
+        };
+
+        var relayoutCount = 0;
+        let registerPlotRelayoutCallback = function(){
+            plot_elements_state.plot.on('plotly_relayout',
+                function(eventdata){
+                    relayoutCount++;
+                    setTimeout(function () {
+                        relayoutCount--;
+                        if(relayoutCount<=0)handlePlotlyRelayout();
+                    },300)
+                });
+        };
+
+
         return {
-            registerButtonClick:registerButtonClick
+            registerButtonClick:registerButtonClick,
+            registerPlotRelayoutCallback:registerPlotRelayoutCallback
         }
     })();
 
