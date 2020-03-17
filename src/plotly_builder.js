@@ -148,7 +148,7 @@ let plSetupHolder = function () {
                 setup = setupValues.setup_by_cat[cat];
             }
         }
-        if(setupValues.setup_by_code[code] !== null){
+        if(setupValues.setup_by_code[code] !== undefined && setupValues.setup_by_code[code] !== null){
             for(let s in setupValues.setup_by_code[code]){
                 setup[s] = setupValues.setup_by_code[code][s];
             }
@@ -548,13 +548,36 @@ let plotly_handler = function (plotid,setup_instance) {
             if(color !== null){
                 dataState.visible = true;
                 dataState.color = color;
-                dataState.htmlelement.style.backgroundColor = color;
                 plot_elements_state.activeCodes[code] = true;
-                dataState.htmlelement.classList.add("active");
+                if(dataState.htmlelement !== undefined){
+                    DOMupdates.updateButtonState(dataState.htmlelement,true,color);
+                } else {
+                    DOMupdates.buttonStateUpdateCallback(code,true,color);
+                }
+
             } else {
                 dataState.visible = false;
                 delete plot_elements_state.activeCodes[code];
-                dataState.htmlelement.classList.remove("active");
+                if(dataState.htmlelement !== undefined){
+                    DOMupdates.updateButtonState(dataState.htmlelement,false,"transparent");
+                } else {
+                    DOMupdates.buttonStateUpdateCallback(code,false,color);
+                }
+
+            }
+        };
+
+        let DOMupdates = {
+            updateButtonState: function(button,active,color){
+                button.style.backgroundColor = color;
+                if(active){
+                    button.classList.add("active");
+                } else {
+                    button.classList.remove("active");
+                }
+            },
+            buttonStateUpdateCallback: function (code,active,color) {
+
             }
         };
 
@@ -565,7 +588,8 @@ let plotly_handler = function (plotid,setup_instance) {
             findNewButtonColor:findNewButtonColor,
             releaseButtonColor:releaseButtonColor,
             getRangeAsDate:getRangeAsDate,
-            setButtonStateByColor:setButtonStateByColor
+            setButtonStateByColor:setButtonStateByColor,
+            DOMupdates:DOMupdates
         }
     })();
 
@@ -596,9 +620,7 @@ let plotly_handler = function (plotid,setup_instance) {
 
         let createPlotElems = function(con){
             let plotcont = document.createElement("div");
-            plotcont.classList.add("plot-inner");
             let legend = document.createElement("div");
-            plotcont.classList.add("plot-legend");
             con.appendChild(plotcont);
             con.appendChild(legend);
             return[plotcont,legend];
@@ -614,31 +636,29 @@ let plotly_handler = function (plotid,setup_instance) {
 
         };
 
-        let plotCont = document.getElementById(plotid);
+        return new Promise(resolve => {
+            let plotCont = document.getElementById(plotid);
+            let plotElems = containers;
+            if(plotElems === null)plotElems = createPlotElems(plotCont);
+            let initialLayout = setup_instance.getInitialPlotLayout();
+            populateUnitAxesMapping(initialLayout[4]);
+            plot_elements_state.axes.axisActiveCount = initialLayout[1];
+            plot_elements_state.axes.axisTitles = initialLayout[2];
+            plot_elements_state.axes.axisMap = initialLayout[3];
+            initialLayout[0].annotations = initialLayout[2];
+            initialLayout[0].shapes = [];
 
-        let plotElems = containers;
-        if(plotElems === null)plotElems = createPlotElems(plotCont);
-        else {
-            plotElems[0].classList.add("plot-inner");
-            plotElems[1].classList.add("plot-legend");
-        }
-        let initialLayout = setup_instance.getInitialPlotLayout();
-        populateUnitAxesMapping(initialLayout[4]);
-        plot_elements_state.axes.axisActiveCount = initialLayout[1];
-        plot_elements_state.axes.axisTitles = initialLayout[2];
-        plot_elements_state.axes.axisMap = initialLayout[3];
-        initialLayout[0].annotations = initialLayout[2];
-        initialLayout[0].shapes = [];
+            Plotly.newPlot(plotElems[0], [], initialLayout[0]).then(function (p) {
+                plot_elements_state.plot = p;
+                interactions.registerPlotRelayoutCallback();
+                plot_elements_state.modebar = p.querySelector(".modebar-container");
+                resolve();
+            });
 
-        Plotly.newPlot(plotElems[0], [], initialLayout[0]).then(function (p) {
-            plot_elements_state.plot = p;
-            interactions.registerPlotRelayoutCallback();
-            plot_elements_state.modebar = p.querySelector(".modebar-container");
+            for(let c in setup_instance.setupValues.defaultChartColors){
+                plot_elements_state.datasetColors[c] = setup_instance.setupValues.defaultChartColors[c];
+            }
         });
-
-        for(let c in setup_instance.setupValues.defaultChartColors){
-            plot_elements_state.datasetColors[c] = setup_instance.setupValues.defaultChartColors[c];
-        }
     };
 
 
@@ -1222,7 +1242,6 @@ let plotly_handler = function (plotid,setup_instance) {
                     }
 
                     if(plotState.groupnorm !== null){
-                        let btn = plotState.htmlelement;
                         let legend = plotState.legend;
                         let colors = [];
                         if(legend !== undefined){
@@ -1236,7 +1255,7 @@ let plotly_handler = function (plotid,setup_instance) {
                         } else {
                             colors = "#868686";
                         }
-                        btn.setAttribute("bck-col",colors);
+                        if(plotState.htmlelement !== undefined)plotState.htmlelement.setAttribute("bck-col",colors);
 
                         for (let i=0;i<legend.length;i++){
                             var dataset = {
@@ -1361,35 +1380,59 @@ let plotly_handler = function (plotid,setup_instance) {
         });
     };
 
+    function processRegisterElements(elements){
+
+    }
+
 
     async function registerButton(elements){
         let activeButtons = [];
         let axes = {};
         let missingButtons = {};
-        for(let e = 0;e<elements.length;e++){
-            let code = elements[e].getAttribute("pl-code");
-            let active = elements[e].classList.contains("active");
-            if(plot_elements_state.elems[code] === undefined){
-                plot_elements_state.pendingSetup.push(code);
-                missingButtons[code] = elements[e];
-            } else {
-                plot_elements_state.elems[code].htmlelement = elements[e];
+        if(elements.length === 0) return;
+        if(elements[0] instanceof HTMLElement) {
+            //When DOM nodes
+            for (let e = 0; e < elements.length; e++) {
+                let code = elements[e].getAttribute("pl-code");
+                let active = elements[e].classList.contains("active");
+                if (plot_elements_state.elems[code] === undefined) {
+                    plot_elements_state.pendingSetup.push(code);
+                    missingButtons[code] = elements[e];
+                } else {
+                    plot_elements_state.elems[code].htmlelement = elements[e];
+                }
+                if (active) {
+                    activeButtons.push(code);
+                }
+                let axis = elements[e].getAttribute("y-axis");
+                if (axis !== null) {
+                    axes[code] = axis;
+                }
+                interactions.registerButtonClick(elements[e]);
             }
-            if(active){
-                activeButtons.push(code);
+        } else {
+            //When Object, do not register htmlelement
+            for (let e = 0; e < elements.length; e++) {
+                let code = elements[e].code;
+                let active = elements[e].active;
+                if (plot_elements_state.elems[code] === undefined) {
+                    plot_elements_state.pendingSetup.push(code);
+                }
+                if (active) {
+                    activeButtons.push(code);
+                }
+                let axis = elements[e].yaxis;
+                if (axis !== undefined) {
+                    axes[code] = axis;
+                }
             }
-            let axis = elements[e].getAttribute("y-axis");
-            if(axis !== null){
-                axes[code] = axis;
-            }
-            interactions.registerButtonClick(elements[e]);
         }
         if(plot_elements_state.pendingSetup.length>0){
             await setup_instance.fetchSetupByCode(plot_elements_state.pendingSetup,plotid);
             for(let p=0;p<plot_elements_state.pendingSetup.length;p++){
                 let code = plot_elements_state.pendingSetup[p];
                 plot_elements_state.elems[code] = await setup_instance.getCodeSetup(code,plotid);
-                plot_elements_state.elems[code].htmlelement = missingButtons[code];
+                if(missingButtons[code] !== undefined)plot_elements_state.elems[code].htmlelement = missingButtons[code];
             }
         }
         activeButtons.forEach( code => plot_elements_state.elems[code].visible = true);
@@ -1401,9 +1444,9 @@ let plotly_handler = function (plotid,setup_instance) {
     }
 
     var interactions = (function () {
-        let doPlotButtonClick = function () {
+
+        let toggleDatasetState = function () {
             let code = this.getAttribute("pl-code");
-            console.log('click');
             let plotState = plot_elements_state.elems[code];
             if(plotState.visible){
                 if(plotState.yaxis === "y_state" || plotState.isState === true){
@@ -1415,8 +1458,11 @@ let plotly_handler = function (plotid,setup_instance) {
                 helpers.releaseButtonColor(plotState.color);
                 delete plot_elements_state.activeCodes[code];
                 plot_elements_state.axes.axisActiveCount[plotState.yaxis]--;
-                plotState.htmlelement.style.backgroundColor = "transparent";
-                plotState.htmlelement.classList.remove("active");
+                if(plotState.htmlelement !== undefined){
+                    helpers.DOMupdates.updateButtonState(plotState.htmlelement,false,"transparent");
+                } else {
+                    helpers.DOMupdates.buttonStateUpdateCallback(code,false,color);
+                }
                 plotState.visible = false;
                 setActiveAxes();
                 Plotly.redraw(plot_elements_state.plot);
@@ -1444,7 +1490,7 @@ let plotly_handler = function (plotid,setup_instance) {
 
         let registerButtonClick = function (elem) {
             elem.addEventListener("click",function () {
-                doPlotButtonClick.call(this);
+                toggleDatasetState.call(this);
             });
         };
 
@@ -1567,7 +1613,8 @@ let plotly_handler = function (plotid,setup_instance) {
 
         return {
             registerButtonClick:registerButtonClick,
-            registerPlotRelayoutCallback:registerPlotRelayoutCallback
+            registerPlotRelayoutCallback:registerPlotRelayoutCallback,
+            toggleDatasetState:toggleDatasetState
         }
     })();
 
@@ -1584,6 +1631,7 @@ let plotly_handler = function (plotid,setup_instance) {
         overWriteFunctions:overWriteFunctions,
         registerButtons:registerButtons,
         ajax:helpers.ajax,
+        domUpdaters:helpers.DOMupdates,
         executeFunc: function (fname,params) {
             if(runFunctions[fname] !== undefined){
                 helpers.queue.addToQueue(runFunctions[fname],params);
