@@ -9,17 +9,20 @@ var plotlyBuilder = (function () {
     var setup;
 
     var checkPlotlyInstance = function () {
+        let ret = {plotly:false};
         if (typeof Plotly === "undefined"){
             console.error("Could not find Plotly.js - download from https://github.com/plotly/plotly.js/");
-            return false;
         } else if (Plotly.Plots === undefined || Plotly.Plots.allTypes === undefined) {
             console.error("Invalid Plotly.js instance - Unable to find supported categories from Plotly.Plots.allTypes");
-            return false;
         } else {
-            let required = {"scatter":false,"histogram":false};
+            let types = {"scatter":false,"histogram":false};
+            let required = {"scatter":false};
             for (let p=0;p < Plotly.Plots.allTypes.length;p++){
                 let cat = Plotly.Plots.allTypes[p];
-                if(required[cat] !== undefined) required[cat] = true;
+                if(types[cat] !== undefined){
+                    types[cat] = true;
+                    if(required[cat] !== undefined) required[cat] = true;
+                }
             }
             let missing = [];
             for (let r in required){
@@ -29,10 +32,12 @@ var plotlyBuilder = (function () {
             }
             if(missing.length>0){
                 console.error("Could not find following required plot type(s): "+missing.join(", "));
-                return false;
+            } else {
+                ret.plotly = true;
             }
+            ret.plotTypes = types;
         }
-        return true;
+        return ret;
     };
     checkPlotlyInstance();
 
@@ -60,20 +65,24 @@ var plotlyBuilder = (function () {
         return [plotid,elems];
     };
 
+    let initSetup = function (plotid,action,params) {
+        setup = plotly_setup();
+        setup.setupValues.supportedPlotTypes = (checkPlotlyInstance()).plotTypes;
+        setup.setRequestURL(plotid,action,params);
+    };
+
     return {
         getInstance: function (plot,action,params) {
             let [plotid,elems] = parseplot(plot);
             if (!setup) {
-                setup = plotly_setup();
-                setup.setRequestURL(null,action,params);
+                initSetup(null,action,params)
             }
             if(plotinstance[plotid] === undefined)plotinstance[plotid] = createInstance(plotid,setup,elems);
             return plotinstance[plotid];
         },
         getSetup: function (action,params) {
             if (!setup) {
-                setup = plotly_setup();
-                setup.setRequestURL(null,action,params);
+                initSetup(null,action,params)
             }
             return setup;
         },

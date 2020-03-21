@@ -16,7 +16,8 @@ var plotly_time_series_setup = function () {
             "8e3900": false,
             "00b9e2": false,
             "ff00e5": false,
-        }
+        },
+        supportedPlotTypes: {scatter:false,histogram:false}
     };
 
     let overWriteFunctions = {

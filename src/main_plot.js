@@ -224,7 +224,7 @@ var plotly_handler = function (plotid,setup_instance) {
                 if(dataState.htmlelement !== undefined){
                     DOMupdates.updateButtonState(dataState.htmlelement,false,"transparent");
                 } else {
-                    DOMupdates.buttonStateUpdateCallback(code,false,color);
+                    DOMupdates.buttonStateUpdateCallback(code,false,"transparent");
                 }
 
             }
@@ -1108,9 +1108,13 @@ var plotly_handler = function (plotid,setup_instance) {
 
     var interactions = (function () {
 
-        let toggleDatasetState = function () {
-            let code = this.getAttribute("pl-code");
+        let toggleDatasetState = function (code) {
+            if(code === undefined) code = this.getAttribute("pl-code");
             let plotState = plot_elements_state.elems[code];
+            if(plotState === undefined) {
+                console.warn("Invalid code in toggleDatasetState: "+code);
+                return;
+            }
             if(plotState.visible){
                 if(plotState.yaxis === "y_state" || plotState.isState === true){
                     plotAnnotations.toggleStateAnnotations(false,code);
@@ -1124,7 +1128,7 @@ var plotly_handler = function (plotid,setup_instance) {
                 if(plotState.htmlelement !== undefined){
                     helpers.DOMupdates.updateButtonState(plotState.htmlelement,false,"transparent");
                 } else {
-                    helpers.DOMupdates.buttonStateUpdateCallback(code,false,color);
+                    helpers.DOMupdates.buttonStateUpdateCallback(code,false,"transparent");
                 }
                 plotState.visible = false;
                 setActiveAxes();
@@ -1269,7 +1273,7 @@ var plotly_handler = function (plotid,setup_instance) {
                     setTimeout(function () {
                         relayoutCount--;
                         if(relayoutCount<=0)handlePlotlyRelayout();
-                    },300)
+                    },200)
                 });
         };
 
@@ -1295,6 +1299,7 @@ var plotly_handler = function (plotid,setup_instance) {
         registerButtons:registerButtons,
         ajax:helpers.ajax,
         domUpdaters:helpers.DOMupdates,
+        toggleDataSetState: interactions.toggleDatasetState,
         executeFunc: function (fname,params) {
             if(runFunctions[fname] !== undefined){
                 helpers.queue.addToQueue(runFunctions[fname],params);
