@@ -13,7 +13,7 @@ module.exports = {
         new WebpackShellPlugin({
             onBuildExit: [
                 'echo "Transfering files ... "',
-                'cp dist/plotly_time_series.js src/lit/',
+                'cp dist/plotly_time_series.js demo/lit/',
                 'echo "DONE ... "',
             ],
         }),
