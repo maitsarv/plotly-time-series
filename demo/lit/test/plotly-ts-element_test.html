@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>plotly-ts-element test</title>
+
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="../node_modules/@polymer/test-fixture/test-fixture.js"></script>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
+    <script src="../node_modules/wct-mocha/wct-mocha.js"></script>
+
+    <script type="module" src="../src/plotly-ts-litelement.js"></script>
+    <script src="../plot/plotly-finance-1.52.3.js"></script>
+    <script src="../plot/plotly_time_series.js"></script>
+  </head>
+  <body>
+
+    <test-fixture id="BasicTestFixture">
+      <template>
+        <plotly-ts-litelement prop1="new-prop1" plot="test1">
+          <div class="plot-container"></div>
+        </plotly-ts-litelement>
+      </template>
+    </test-fixture>
+
+    <test-fixture id="ChangedPropertyTestFixture">
+      <template>
+        <plotly-ts-litelement prop1="new-prop1" plot="test2">
+          <div class="plot-container"></div>
+        </plotly-ts-litelement>
+      </template>
+    </test-fixture>
+
+    <script type="module">
+
+      var createDemoPlot = function(elem,groups){
+        return new Promise((resolve) => {
+          let buttons = [];
+          elem.addGroup('group1','Group 1');
+          elem.addGroup('group2','Group 2');
+
+          let promises = [];
+          for(let g in groups){
+            for(let c=0;c<groups[g].length;c++){
+              promises.push(elem.createButton(groups[g][c],g,true,buttons));
+            }
+          }
+          Promise.all(promises).then(function () {
+            promises = [];
+            let solved = function () {};
+            let cbPromise = new Promise((resolve) => {solved = resolve});
+            promises.push(cbPromise);
+            promises.push(elem.requestUpdate('groups'));
+            Promise.all(promises).then(function () {
+              resolve();
+            });
+            elem.plotelem.registerButtons(buttons,solved);
+          });
+        });
+      };
+
+      suite('plotly-ts-litelement', () => {
+
+        test('instantiating the element with default properties works', (done) => {
+          const element = fixture('BasicTestFixture');
+          element.updateComplete.then(() => {
+            assert.equal(element.plotId, 'test1-ts-lit');
+            const elementShadowRoot = element.shadowRoot;
+            const elementHeader = elementShadowRoot.querySelector('h2');
+            assert.equal(elementHeader.innerHTML, 'Plotly time series lit-element demo');
+            done();
+          });
+        });
+
+        test('Click on plot button works', (done) => {
+          // Create a test fixture
+          const element = fixture('ChangedPropertyTestFixture');
+          assert.equal(element.plotId, 'test2-ts-lit');
+          element.updateComplete.then(() => {
+            const elementShadowRoot = element.shadowRoot;
+            let groups = {
+              'group1':['t1','t2'],
+              'group2':['t3','t4'],
+            };
+            createDemoPlot(element,groups).then(() => {
+              const plotButton = elementShadowRoot.querySelector('div.plot-button[pl-code="t1"]');
+              let btnState = element.groups.get('group1').buttons.get('t1');
+              let active = btnState.active === "active";
+              let click = new Event("click");
+              console.log(active,btnState);
+              plotButton.dispatchEvent(click);
+              assert.equal(btnState.active === "active", !active);
+              done();
+            });
+          });
+        });
+
+      });
+
+
+    </script>
+
+  </body>
+</html>

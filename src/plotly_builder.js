@@ -1,9 +1,6 @@
 import plotly_setup from './setup_holder.js';
 import plotly_handler from "./main_plot";
 
-
-console.log(plotly_setup,plotly_handler);
-
 var plotlyBuilder = (function () {
     var plotinstance = {};
     var setup;

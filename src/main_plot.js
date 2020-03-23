@@ -300,9 +300,11 @@ var plotly_handler = function (plotid,setup_instance) {
         };
 
         return new Promise(resolve => {
-            let plotCont = document.getElementById(plotid);
             let plotElems = containers;
-            if(plotElems === null)plotElems = createPlotElems(plotCont);
+            if(plotElems === null){
+                let plotCont = document.getElementById(plotid);
+                plotElems = createPlotElems(plotCont);
+            }
             let initialLayout = setup_instance.getInitialPlotLayout();
             populateUnitAxesMapping(initialLayout[4]);
             plot_elements_state.axes.axisActiveCount = initialLayout[1];
@@ -311,6 +313,7 @@ var plotly_handler = function (plotid,setup_instance) {
             initialLayout[0].annotations = initialLayout[2];
             initialLayout[0].shapes = [];
 
+            console.log(plotElems);
             Plotly.newPlot(plotElems[0], [], initialLayout[0]).then(function (p) {
                 plot_elements_state.plot = p;
                 interactions.registerPlotRelayoutCallback();
@@ -1103,7 +1106,8 @@ var plotly_handler = function (plotid,setup_instance) {
             plot_elements_state.elems[code].yaxis = axes[code];
         }
         plot_elements_state.pendingSetup = [];
-        return addNewDatasets(activeButtons);
+        addNewDatasets(activeButtons);
+        return Promise.resolve();
     }
 
     var interactions = (function () {
@@ -1285,8 +1289,8 @@ var plotly_handler = function (plotid,setup_instance) {
         }
     })();
 
-    let registerButtons = function(elements){
-        helpers.queue.addToQueue(registerButton,[elements]);
+    let registerButtons = function(elements,whenDone){
+        helpers.queue.addToQueue(registerButton,[elements],whenDone);
     };
 
     let runFunctions = {

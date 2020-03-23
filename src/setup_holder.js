@@ -9,15 +9,15 @@ var plotly_time_series_setup = function () {
         defaultChartColors:{
             "1f77b4": false,
             "63b800": false,
-            "00dcab": false,
             "e15b00": false,
             "000000": false,
             "0054af": false,
             "8e3900": false,
             "00b9e2": false,
             "ff00e5": false,
+            "dcc539": false,
         },
-        supportedPlotTypes: {scatter:false,histogram:false}
+        supportedPlotTypes: {scatter:false,histogram:false},
     };
 
     let overWriteFunctions = {

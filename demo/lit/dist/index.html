@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+    <title>plotly-ts-litelement</title></head>
+<body>
+<plotly-ts-litelement>
+    <div class="plot-container"></div>
+</plotly-ts-litelement>
+<script src="../plot/plotly-finance-1.52.3.js"></script>
+<script src="../plot/plotly_time_series.js"></script>
+<script src="./plotly_ts_lit_element.js"></script>
+
+<script type="text/javascript">
+
+    var createDemoPlot = function(elem,groups){
+        return new Promise((resolve) => {
+            let buttons = [];
+            elem.addGroup('group1','Group 1');
+            elem.addGroup('group2','Group 2');
+
+            let active = true;
+            let promises = [];
+            for(let g in groups){
+                for(let c=0;c<groups[g].length;c++){
+                    promises.push(elem.createButton(groups[g][c],g,active,buttons));
+                    //active = false;
+                }
+            }
+            Promise.all(promises).then(function () {
+                promises = [];
+                let solved = function () {};
+                let cbPromise = new Promise((resolve) => {solved = resolve});
+                promises.push(cbPromise);
+                promises.push(elem.requestUpdate('groups'));
+                Promise.all(promises).then(function () {
+                    resolve();
+                });
+                elem.plotelem.registerButtons(buttons,solved);
+            });
+        });
+    };
+
+    (function () {
+        customElements.whenDefined('plotly-ts-litelement').then(() => {
+            const element = document.querySelector("plotly-ts-litelement");
+            element.updateComplete.then(() => {
+                let groups = {
+                    'group1':['t1','t2'],
+                    'group2':['t3','t4'],
+                };
+                createDemoPlot(element,groups)
+            });
+        });
+    })();
+</script>
+
+</body>
+</html>

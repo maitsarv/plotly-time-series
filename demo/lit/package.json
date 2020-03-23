@@ -1,0 +1,25 @@
+{
+  "name": "plotly-ts-element",
+  "description": "DOM element for plotly time series visualization",
+  "main": "plotly-ts-element.js",
+  "dependencies": {
+    "@polymer/polymer": "^3.0.0",
+    "lit-element": "^2.3.1",
+    "webpack-merge": "latest"
+  },
+  "devDependencies": {
+    "@open-wc/building-webpack": "^2.13.8",
+    "@polymer/iron-demo-helpers": "^3.1.0",
+    "@polymer/test-fixture": "^4.0.2",
+    "@webcomponents/webcomponentsjs": "^2.4.3",
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4",
+    "wct-mocha": "^1.0.1",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2",
+    "webpack-shell-plugin": "^0.5.0"
+  },
+  "scripts": {
+    "build": "webpack --mode production"
+  }
+}
