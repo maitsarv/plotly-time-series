@@ -9,6 +9,9 @@ module.exports = {
         library: 'plotlyTimeSeries',
         libraryExport: "default",
     },
+    optimization: {
+        minimize: false
+    },
     plugins: [
         new WebpackShellPlugin({
             onBuildExit: [

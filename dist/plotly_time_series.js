@@ -1,1 +1,1859 @@
-var plotlyTimeSeries=function(e){var t={};function o(l){if(t[l])return t[l].exports;var n=t[l]={i:l,l:!1,exports:{}};return e[l].call(n.exports,n,n.exports,o),n.l=!0,n.exports}return o.m=e,o.c=t,o.d=function(e,t,l){o.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:l})},o.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},o.t=function(e,t){if(1&t&&(e=o(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var l=Object.create(null);if(o.r(l),Object.defineProperty(l,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var n in e)o.d(l,n,function(t){return e[t]}.bind(null,n));return l},o.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return o.d(t,"a",t),t},o.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},o.p="",o(o.s=0)}([function(e,t,o){"use strict";o.r(t);var l=function(){let e={setup_by_cat:{},setup_by_code:{},cat_by_code:{},current_time:new Date,defaultHistogramSetup:{opacity:.22},defaultChartColors:{"1f77b4":!1,"63b800":!1,e15b00:!1,"000000":!1,"0054af":!1,"8e3900":!1,"00b9e2":!1,ff00e5:!1,dcc539:!1},supportedPlotTypes:{scatter:!1,histogram:!1}},t={globalSetup:null,setupByCode:null,setupByCat:null},o={default:[],plot:{}},l=function(e,t){let l=o.default;null!==e&&void 0!==o.plot[e]&&(l=o.plot[e]);let n=l[1];return null===n&&(n=[]),n.push("req="+t),n=n.join("&"),l=l[0]+"?"+n,l},n=function(o,n){return Array.isArray(o)||(o=[o]),null!==t.setupByCode?new Promise((l,a)=>{Promise.resolve(t.setupByCode(o,n,e)).then((function(){for(let t=0;t<o.length;t++)void 0===e.setup_by_code[o[t]]&&(e.setup_by_code[o[t]]=null);l()}))}):new Promise((t,a)=>{let r=l(n);$.ajax({url:r,method:"GET",data:{codes:o},success:function(o){if(o.success&&void 0!==o.codesetup)for(let t in o.codesetup)e.setup_by_code[t]=o.codesetup[t];if(void 0!==o.codecat)for(let t in o.codecat)e.cat_by_code[t]=o.codecat[t];t()},error:function(){t()}})})},a=function(t){let o={unit:"",unithtml:"",plot_type:"scatter",normalize:!1,groupnorm:null,yaxis:null,opacityMap:{},desc:""};if(void 0!==e.cat_by_code[t]){let l=e.cat_by_code[t];void 0!==e.setup_by_cat[l]&&(o=e.setup_by_cat[l])}if(void 0!==e.setup_by_code[t]&&null!==e.setup_by_code[t])for(let l in e.setup_by_code[t])o[l]=e.setup_by_code[t][l];return o};return{setupValues:e,requestURLs:o,overWriteFunctions:t,setRequestURL:function(e,t,l){null===e?o.default=[t,l]:o.plot[e]=[t,l]},getCodeSetup:async function(t,o){return void 0!==e.setup_by_code[t]||await n(t,o),a(t)},getInitialPlotLayout:function(){var t={y_temp:"°C",y_percent:"SW",y_pres:"bar",y_presk:"kPa",y_tempdelta:"Δ°C",y_hour:"h",y_freq:"Hz",y_volume_ms:"m³/s",y_speed:"m/s",y_volume_ls:"L/s",y_volume_lh:"l/h",y_volume_mh:"m³/h",y_volume:"m³",y_power_k:"kW",y_power:"W",y_ppm:"ppm",y_ppb:"ppb",y_energy:"kWh",y_energy_wh:"Wh",y_eur:"EUR",y_rpm:"rpm",y_state:"St"},o={y_percent_stacked:{range:[0,100],fixedrange:!0},y_percent:{range:[0,101],fixedrange:!0},y_temp:{rangemode:"normal"},y_state:{range:[0,100],fixedrange:!0,autorange:!1}},l={showlegend:!1,autosize:!0,responsive:!0,margin:{b:8,t:20,l:40,r:40,pad:2},plot_bgcolor:"rgba(255,255,255,0)",bargap:.05,xaxis:{domain:[0,.9],hoverformat:"%Y-%m-%d %H:%M",tickformat:"%m-%d %H:%M",tickformatstops:[{dtickrange:[864e5,6048e5],value:"%m-%d"},{dtickrange:[6048e5,"M1"],value:"%m-%d"},{dtickrange:["M1","M12"],value:"%Y-%m"},{dtickrange:["M12",null],value:"%Y"}],rangeslider:{},type:"date",calendar:"gregorian",spikethickness:1,showspikes:!1,range:[new Date((new Date).setDate(e.current_time.getDate()-7)),e.current_time]}};let n=1,a={};var r={},i=[];for(let e in t){if(void 0!==a[e])continue;let s={titlefont:{color:"#686868"},tickfont:{color:"#668866"},side:"left",showline:!1,showgrid:!1,zeroline:!1,showticklabels:!1,xaxis:"x1",rangemode:"tozero",fixedrange:!1,hoverformat:".2f",hoverinfo:"y+name",spikethickness:1,showspikes:!1,autorange:!0},u={xref:"paper",yref:"paper",x:0,xanchor:"right",y:1,yanchor:"bottom",text:t[e],font:{size:12,color:"rgba(0,0,0,0)"},showarrow:!1};if(n>1&&(s.overlaying="y"),void 0!==o[e])for(let t in o[e])s[t]=o[e][t];n>1?(u.axis="yaxis"+n,l["yaxis"+n]=s,a[e]=n):(u.axis="yaxis",l.yaxis=s,a[e]=""),i.push(u),r[e]=0,n++}return[l,r,i,a,t]},fetchSetupByCode:n,fetchGlobalSetup:function(o){if(null!==t.globalSetup)return new Promise((o,l)=>{Promise.resolve(t.globalSetup(e)).then((function(){o()}))});let n=l(o,"global-setup");$.ajax({url:n,method:"GET",success:function(t){if(t.success){if(void 0!==t.codesetup)for(let o in t.codesetup)e.setup_by_code[o]=t.codesetup[o];if(void 0!==t.catsetup)for(let o in t.catsetup)e.setup_by_cat[o]=t.catsetup[o];if(void 0!==t.codecat)for(let o in t.codecat)e.cat_by_code[o]=t.codecat[o]}else alert("Could not load setup")}})},getQueryUrl:l}},n=function(e,t){let o=function(){let e=function(){let e=[],t=!1;var o=function(){if(e.length>0){t=!0;let l=e.shift(),n=l[0].apply(null,l[1]);void 0!==n&&"function"==typeof n.then?n.then((function(){void 0!==l[2]&&"function"==typeof l[2]&&l[2](),o()})):(void 0!==l[2]&&"function"==typeof l[2]&&l[2](),o())}else t=!1};return{addToQueue:function(l,n,a){e.push([l,n,a]),!1===t&&o()}}}(),t={JSON_PARSE:function(e){e.values=JSON.parse(e.values)},TYPE_CONVERSION:function(e){for(let t=0;t<e.values.length;t++)e.values[t][0]=new Date(e.values[t][0]).getTime()/1e3,e.values[t][1]=parseFloat(e.values[t][1]).toFixed(2)},CSV_SIMPLE:function(e){let t=e.values;t=t.split("\n"),t.length>0?e.values=o(t):e.values=[]},CSV_W_HEADER:function(e){let t=e.values;t=t.split("\n"),t.length>1?(t.shift(),e.values=o(t)):e.values=[]},REMOVE_REPEATING_ROW:function(e){let t=[],o=null;for(let l=0;l<e.values.length;l++)e.values[l][1]!==o&&(t.push(e.values[l]),o=e.values[l][1]);e.values=t}},o=function(e){for(let t=0;t<e.length;t++)e[t]=e[t].split(","),e[t]=[new Date(e[t][0]).getTime()/1e3,parseFloat(e[t][1]).toFixed(2)];return e};var l={x:function(){if("undefined"!=typeof XMLHttpRequest)return new XMLHttpRequest;for(var e,t=["MSXML2.XmlHttp.6.0","MSXML2.XmlHttp.5.0","MSXML2.XmlHttp.4.0","MSXML2.XmlHttp.3.0","MSXML2.XmlHttp.2.0","Microsoft.XmlHttp"],o=0;o<t.length;o++)try{e=new ActiveXObject(t[o]);break}catch(e){}return e},send:function(e,t,o,n,a){var r=l.x(),i=[];for(var s in o)i.push(encodeURIComponent(s)+"="+encodeURIComponent(o[s]));"GET"===t?(e+=i.length?"?"+i.join("&"):"",o=""):"POST"===t&&(o=i.join("&")),r.open(t,e,!0),r.onreadystatechange=function(){4===r.readyState&&n(r.responseText)},"POST"===t&&r.setRequestHeader("Content-type","application/x-www-form-urlencoded");for(let e in a)r.setRequestHeader(e,a[e]);r.send(o)},get:function(e,t,o,n){var a=[];for(var r in t)a.push(encodeURIComponent(r)+"="+encodeURIComponent(t[r]));l.send(e+(a.length?"?"+a.join("&"):""),o,"GET",null,n)},post:function(e,t,o,n){var a=[];for(var r in t)a.push(encodeURIComponent(r)+"="+encodeURIComponent(t[r]));l.send(e,o,"POST",a.join("&"),n)}};let a={updateButtonState:function(e,t,o){e.style.backgroundColor=o,t?e.classList.add("active"):e.classList.remove("active")},buttonStateUpdateCallback:function(e,t,o){}};return{queue:e,dataFormatters:t,ajax:l,findNewButtonColor:function(e){let t=null;if(void 0!==e&&(e=e.replace("#",""),!1===n.datasetColors[e]))return t="#"+e,n.datasetColors[e]=!0,t;for(let e in n.datasetColors)if(!1===n.datasetColors[e]){t="#"+e,n.datasetColors[e]=!0;break}return t},releaseButtonColor:function(e){e=e.replace("#",""),n.datasetColors[e]=!1},getRangeAsDate:function(e){let t=e[0],o=e[1];return"string"==typeof t&&(t=new Date(t)),"string"==typeof o&&(o=new Date(o)),[t,o]},setButtonStateByColor:function(e,t,o){null!==t?(e.visible=!0,e.color=t,n.activeCodes[o]=!0,void 0!==e.htmlelement?a.updateButtonState(e.htmlelement,!0,t):a.buttonStateUpdateCallback(o,!0,t)):(e.visible=!1,delete n.activeCodes[o],void 0!==e.htmlelement?a.updateButtonState(e.htmlelement,!1,"transparent"):a.buttonStateUpdateCallback(o,!1,"transparent"))},DOMupdates:a}}(),l={queryData:null},n={plot:{},elems:{},axes:{axisActiveCount:{},axisTitles:{},axisMap:{}},shapeGroups:{},datasetColors:{},pendingSetup:[],unit_to_axes:{},timeformat:"unix",activeCodes:{},modebar:{}},a={getStateAnnotations:function(e){var t,l,a=[],r=0;for(let s in e)if(e.hasOwnProperty(s)){let u=e[s].values,p=n.elems[s],d="#868686";!0===p.visible&&(void 0===n.datasetColors[868686]||!1===n.datasetColors[868686]?(n.datasetColors[868686]=!0,d="#868686"):u.length>0&&(d=o.findNewButtonColor()),o.setButtonStateByColor(p,d,s)),u.length>0&&(u[0][0]=new Date(1e3*u[0][0]));for(var i=0;i<u.length;i++){t=0,l=null;let e=parseInt(u[i][1]);0!==u[i][0]&&(t=u[i][0]);let o=u[i+1];void 0!==o?(o[0]=new Date(1e3*o[0]),l=o[0]):l=n.plot.layout.xaxis.range[1];let c=p.opacityMap[e];void 0===c&&(c=.04+.12*e);let f={id:"state_"+s+"_"+i,type:"rect",xref:"x",yref:"y"+n.axes.axisMap[p.yaxis],x0:t,y0:r,x1:l,y1:r+2,fillcolor:d,opacity:c,visible:p.visible,line:{width:0}};a.push(f),void 0===n.shapeGroups[s]&&(n.shapeGroups[s]=[]),n.shapeGroups[s].push(f)}!0===p.visible&&(r+=2)}return a},appendStateDataToPlot:function(e,o,l){let a=n.shapeGroups[e],r=null,i={};a.length>0?(r=a[0],i=r):i={id:"",type:"rect",xref:"x",yref:"y",x0:0,y0:0,x1:t.setupValues.current_time,y1:2,fillcolor:"#868686",opacity:.5,visible:!1,labeltext:"",line:{width:0}};let s=[],u=n.elems[e];o.length>0&&(o[0][0]=new Date(1e3*o[0][0]));for(let t=0;t<o.length;t++){let a=parseInt(o[t][1]),p=u.opacityMap[a];void 0===p&&(p=.04+.12*a);let d=0,c=null;0!==o[t][0]&&(d=o[t][0]),void 0!==o[t+1]&&0!==o[t+1][0]?(o[t+1][0]=new Date(1e3*o[t+1][0]),c=o[t+1][0]):c=n.plot.layout.xaxis.range[1];let f=!0;"prepend"===l&&void 0===o[t+1]&&null!==r&&(r.opacity===p?(f=!1,r.x0=d):c=r.x0);let y={id:"state_"+e+"_"+t,type:"rect",xref:"x",yref:"y"+n.axes.axisMap[u.yaxis],x0:d,y0:i.y0,x1:c,y1:i.y1,fillcolor:i.fillcolor,opacity:p,visible:u.visible,line:{width:0}};f&&s.push(y)}if("prepend"===l)for(let t=s.length-1;t>=0;t--)n.plot.layout.shapes.push(s[t]),n.shapeGroups[e].unshift(s[t]);if("append"===l)for(let t=0;t<s.length;t++)n.plot.layout.shapes.push(s[t]),n.shapeGroups[e].unshift(s[t])},toggleStateAnnotations:function(e,t,o){if(void 0!==n.shapeGroups[t])for(let l=0;l<n.shapeGroups[t].length;l++)n.shapeGroups[t][l].visible=e,n.shapeGroups[t][l].fillcolor=o}},r=function(a){return new Promise((r,i)=>{let s=function(e,t){let o=e.length,l=o-1;for(;l>=0&&!(e[l][0]<t);l-=10);let n=10;if(l<=0)n=10+l,l=0;else if(l===o-1)return e;for(let o=0;o<=n&&!(e[l][0]>=t);o++)l++;e.splice(l)},u=function(e,t){for(var o=0;o<e.length&&!(e[o][0]>t);o+=10);let l=10;o>=e.length-1?(l=10-(o-e.length),o=e.length):0===o&&(l=0,e[o][0]>t&&(o=-1));for(let n=0;n<l&&!(e[--o][0]<=t);n++);e.splice(0,o+1)},p=function(e){let[t,l]=o.getRangeAsDate(n.plot.layout.xaxis.range),a=parseInt(t.getTime()/1e3),r=parseInt(l.getTime()/1e3),i={codes:{}};for(let t in e){let o=e[t],l=n.elems[o],s=a,u=r;if(void 0!==l.index&&null!==l.index&&l.index.length>0){let e=n.plot.data[l.index[0]].x[0];e=parseInt(e.getTime()/1e3),u=e}else if(void 0!==n.shapeGroups[o]&&n.shapeGroups[o].length>0){let e=n.shapeGroups[o][0];u=parseInt(e.x0/1e3)}s>=u||(void 0!==l.group?void 0!==l.query_group&&!0===l.query_group?i[l.group]=[s,u]:(void 0===i[l.group]&&(i[l.group]={}),i[l.group][o]=[s,u]):i.codes[o]=[s,u])}return i}(a),d={};var c;d=null!==l.queryData?Promise.resolve(l.queryData(p)):new Promise((l,n)=>{o.ajax.send(t.getQueryUrl(e,"time-data"),"POST",c,(function(e){l(e)}))}),d.then((function(e){let t=function(e){let t=[{},{}];for(let l in e)for(let a in e[l]){let r=[],i=n.elems[a],p={mode:"append",structure:void 0===i.datastructure?"row":i.datastructure,values:[]};Array.isArray(e[l][a])?p.values=e[l][a]:(p.values=e[l][a].values,void 0!==e[l][a].format&&(r=e[l][a].format)),"y_state"!==i.yaxis&&!0!==i.isState||r.unshift("REMOVE_REPEATING_ROW");for(let e=0;e<r.length;e++){let t=r[e];void 0!==o.dataFormatters[t]&&"function"==typeof o.dataFormatters[t]&&o.dataFormatters[t](p)}if("row"===p.structure&&p.values.length>0){let e=p.values[0][0];if(e!==parseInt(e)){console.warn(a+": Time format after data formatters is not correct. Expected unix timestamp format");continue}let t=p.values[p.values.length-1][0];if(void 0!==i.index){let o=n.plot.data[i.index[0]].x,l=o.length;if(l>0){let n=o[0],a=o[l-1];n>e?(p.mode="prepend",t>n&&s(p.values,n)):e<a&&u(p.values,a)}}else if(void 0!==n.shapeGroups[a]){let o=n.shapeGroups[a].length;if(o>0){let l=n.shapeGroups[a][0].x0,r=n.shapeGroups[a][o-1].x1;l>e?(p.mode="prepend",t>l&&s(p.values,l)):e<r&&u(p.values,r)}}}"y_state"===i.yaxis||!0===i.isState?t[1][a]=p:t[0][a]=p}return t}(e);r(t)}))})};var i=function(e,t,o){return void 0!==e.structure&&"trace"===e.structure?function(e,t,o){let l=[[],[]],n=e.values;if(void 0!==t.normalize&&!1!==t.normalize);else{for(let e=0;e<n[0].length;e++)l[0].push(new Date(1e3*parseInt(n[0][e])));l[1]=n[1]}return[l[0],l[1]]}(e,t):function(e,t,o){let l=[[],[]],a=e.values,r=[];if(void 0!==t.normalize&&!1!==t.normalize){let e=600,i=2*e;!0!==t.normalize&&(e=t.normalize);let s=0,u=0,p=null,d=1;if(a.length>0&&(s=p[0],u=p[1],"prepend"===o&&(p=a[0])),"append"===o){if(void 0!==t.index){let e=n.plot.data[t.index[0]];e.length>0&&(s=e.x[e.x.length-1],u=e.y[e.y.length-1])}d=0}for(;d<a.length;d++){let t=parseInt(a[d][0]),o=t-s;if(!(o<e)){if(o<=i){l[0].push(new Date(1e3*t));let e=a[d][1]-u;l[1].push(e)}else r.push([s,t]);u=a[d][1],s=t}}if("prepend"===o){if(void 0!==t.index&&void 0!==t.firstvalue){let o=t.firstvalue,n=o[0]-s;n<=i&&n>=e&&(l[0].push(new Date(1e3*o[0])),l[1].push(o[1]-u))}null!==p&&(t.firstvalue=p)}}else if(null!==t.groupnorm){if(a.length>0){let e=a.length,o=t.legend.length;l[1]=new Array(o);for(let t=0;t<o;t++)l[1][t]=new Array(e);for(let t=0;t<e;t++){l[0].push(new Date(1e3*parseInt(a[t][0])));for(let e=0;e<o;e++)l[1][e][t]=a[t][e+1],l[1][e][t]=parseFloat(l[1][e][t])}}}else for(let e=0;e<a.length;e++)l[0].push(new Date(1e3*parseInt(a[e][0]))),l[1].push(a[e][1]),a[e][1]=parseFloat(a[e][1]);return[l[0],l[1]]}(e,t,o)},s=function(e,t,o){let l=n.elems[t];if(void 0!==o){let e=n.plot.data[l.index[0]];e.line.color=o,e.marker.color=o}Plotly.restyle(n.plot,"visible",e,l.index)},u=function(){let e=n.plot.layout,t=e.annotations,o={};for(let e in t)o[t[e].axis]=t[e];var l=[];for(let t in n.axes.axisActiveCount)if(n.axes.axisActiveCount[t]>0)l.push(t);else{let l="yaxis"+n.axes.axisMap[t];e[l].showline=!1,e[l].showgrid=!1,e[l].showticklabels=!1,e[l].side="right",e[l].anchor="x",e[l].position=0,e[l].title.font.color="rgba(0,0,0,0)",o[l].font.color="rgba(0,0,0,0)"}for(let t=0;t<l.length;t++){var a=l[t];let r="yaxis"+n.axes.axisMap[a];if(e[r].title.font.color="#868686",o[r].font.color="#868686",0===t)e[r].side="left",e[r].showline=!0,e[r].showgrid=!0,e[r].showticklabels=!0,o[r].x=0,o[r].xref="paper",o[r].xanchor="right";else{e[r].showline=!0,e[r].showgrid=!0,e[r].showticklabels=!0,e[r].side="right",void 0!==e.xaxis.range?o[r].x=e.xaxis.range[1]:o[r].x=(new Date).getTime(),o[r].xanchor="left";let l=.87+.03*t;t>1?(e[r].anchor="free",e[r].position=l):e[r].anchor="x",o[r].xref="paper",o[r].x=l}}},p=function(e){return new Promise((t,o)=>{0===e.length&&t(),r(e).then((function(e){let o=e[0],l=e[1],r={append:[[],[],[],[]],prepend:[[],[],[],[]]};for(let e in o){let t=n.elems[e],l=i(o[e],t,o[e].mode);null===t.groupnorm&&("append"===o[e].mode?(r.append[0].push(l[0]),r.append[1].push(l[1]),r.append[2].push(t.index[0])):(r.prepend[0].push(l[0]),r.prepend[1].push(l[1]),r.prepend[2].push(t.index[0])))}r.append[0].length>0&&Plotly.extendTraces(n.plot,{y:r.append[1],x:r.append[0]},r.append[2]),r.prepend[0].length>0&&Plotly.prependTraces(n.plot,{y:r.prepend[1],x:r.prepend[0]},r.prepend[2]);for(let e in l)a.appendStateDataToPlot(e,l[e].values,l[e].mode);t()}))})};async function d(l){let s=[],p={},d={};if(0!==l.length){if(l[0]instanceof HTMLElement)for(let e=0;e<l.length;e++){let t=l[e].getAttribute("pl-code"),o=l[e].classList.contains("active");void 0===n.elems[t]?(n.pendingSetup.push(t),d[t]=l[e]):n.elems[t].htmlelement=l[e],o&&s.push(t);let a=l[e].getAttribute("y-axis");null!==a&&(p[t]=a),c.registerButtonClick(l[e])}else for(let e=0;e<l.length;e++){let t=l[e].code,o=l[e].active;void 0===n.elems[t]&&n.pendingSetup.push(t),o&&s.push(t);let a=l[e].yaxis;void 0!==a&&(p[t]=a)}if(n.pendingSetup.length>0){await t.fetchSetupByCode(n.pendingSetup,e);for(let o=0;o<n.pendingSetup.length;o++){let l=n.pendingSetup[o];n.elems[l]=await t.getCodeSetup(l,e),void 0!==d[l]&&(n.elems[l].htmlelement=d[l])}}s.forEach(e=>n.elems[e].visible=!0);for(let e in p)n.elems[e].yaxis=p[e];return n.pendingSetup=[],f=s,new Promise((e,l)=>{0===f.length&&e(),r(f).then((function(l){let r=n.plot.layout,s=l[0],p=l[1];var d=[];for(let e in s){if(void 0!==n.elems[e]&&void 0!==n.elems[e].index)continue;let l=n.elems[e];var c=l.fixedcolor,f=l.yaxis;let a=l.plot_type,u=i(s[e],l,s[e].mode);null==f&&(f="y_temp");let p=l.desc;if(!0===l.visible&&(null!==c&&""!==c&&void 0!==c||(c=o.findNewButtonColor()),o.setButtonStateByColor(l,c,e),l.visible&&n.axes.axisActiveCount[f]++),null!==l.groupnorm){let t=l.legend,o=[];if(void 0!==t)for(let e=0;e<t.length;e++)o.push(t[e][2]);if(o.length>0){let e=o.join(",");o="linear-gradient(-45deg, "+e+")"}else o="#868686";void 0!==l.htmlelement&&l.htmlelement.setAttribute("bck-col",o);for(let o=0;o<t.length;o++)(y={id:e+"_"+o,visible:l.visible,name:t[o][0],x:u[0],y:u[1][o],yaxis:"y"+n.axes.axisMap[f],marker:{color:t[o][1],size:2},line:{color:t[o][1],width:1},fillcolor:t[o][1],mode:"lines",type:a,stackgroup:e,xcalendar:"gregorian",ycalendar:"gregorian",plfirstvalue:u[2]}).groupnorm=l.groupnorm,d.push(y)}else{var y={id:e,visible:l.visible,name:p,x:u[0],y:u[1],yaxis:"y"+n.axes.axisMap[f],marker:{color:c,size:2},line:{color:c,width:1},mode:"lines",type:a,xcalendar:"gregorian",ycalendar:"gregorian",plfirstvalue:u[2]};let o=36e5;"histogram"===a&&(y.autobiny=!0,y.histfunc="sum",y.marker.line={color:y.marker.color,width:1},y.marker.opacity=t.setupValues.defaultHistogramSetup.opacity,y.xbins={size:o},sharedBinningDataset[e]=y,void 0===r.updatemenus&&(r.updatemenus=updateMenus)),d.push(y)}}let g=a.getStateAnnotations(p);n.plot.layout.shapes=n.plot.layout.shapes.concat(g),u();let h=n.plot.data.length;for(Plotly.addTraces(n.plot,d);h<n.plot.data.length;h++){let e=n.plot.data[h].id;void 0!==n.plot.data[h].stackgroup&&(e=n.plot.data[h].stackgroup),void 0===n.elems[e].index&&(n.elems[e].index=[]),n.elems[e].index.push(h)}e()}))});var f}}var c=function(){let e=function(e){void 0===e&&(e=this.getAttribute("pl-code"));let t=n.elems[e];if(void 0!==t)if(t.visible)"y_state"===t.yaxis||!0===t.isState?a.toggleStateAnnotations(!1,e):s(!1,e),o.releaseButtonColor(t.color),delete n.activeCodes[e],n.axes.axisActiveCount[t.yaxis]--,void 0!==t.htmlelement?o.DOMupdates.updateButtonState(t.htmlelement,!1,"transparent"):o.DOMupdates.buttonStateUpdateCallback(e,!1,"transparent"),t.visible=!1,u(),Plotly.redraw(n.plot);else{let r=t.fixedColor;if(null==r&&(r=o.findNewButtonColor(t.color)),o.setButtonStateByColor(t,r,e),!1===t.visible)return;n.axes.axisActiveCount[t.yaxis]++,"y_state"===t.yaxis||!0===t.isState?a.toggleStateAnnotations(!0,e,r):(s(!0,e,r),u(),l(),Plotly.redraw(n.plot)),o.queue.addToQueue(p,[[e]],(function(){Plotly.redraw(n.plot)}))}else console.warn("Invalid code in toggleDatasetState: "+e)};var t=[null,null];let l=function(){let e=n.plot.calcdata,t={};for(let o=0;o<e.length;o++){let l=e[o][0].trace;if(0==l.visible)continue;let n=l.yaxis,a=l._extremes[n],r=a.min[0].val,i=a.max[0].val;void 0!==r&&(void 0===t[n]?t[n]=[r,i]:(t[n][0]>r&&(t[n][0]=r),t[n][1]<i&&(t[n][1]=i)))}let o=!1,l=n.modebar.querySelector(".modebar-btn[data-val='pan']");null!==l&&(o=l.classList.contains("active"));for(let e in t){let l=t[e],a=.05*(l[1]-l[0]);l[0]=l[0]-a,l[1]=l[1]+a;let r=e.replace("y",""),i=n.plot.layout["yaxis"+r].range;if(o){if(i[0]<l[0]){let e=i[1]-i[0];i[0]=l[0],i[1]=l[0]+e}else if(i[1]>l[1]){let e=i[1]-i[0];i[1]=l[1],i[0]=l[1]-e}}else i[0]<l[0]&&(i[0]=l[0]),i[1]>l[1]&&(i[1]=l[1]);i[0]>i[1]&&(i[1]=i[0]+a)}};var r=function(){(function(e){if(null===t)return t=e,!0;let o=!1;return t[0]>e[0]&&(o=!0),t[1]<e[1]&&(o=!0),t=e,o})(o.getRangeAsDate(n.plot.layout.xaxis.range))&&o.queue.addToQueue(p,[Object.keys(n.activeCodes)],(function(){!function(){let e=o.getRangeAsDate(n.plot.layout.xaxis.range),t=n.plot.data,l=null,a=null;for(let e in t){let o=t[e].x.length;if(o>0){let n=t[e].x[0],r=t[e].x[o-1];(null===l||n<l)&&(l=n),(null===a||r>a)&&(a=r)}}let[r,i]=e,s=!1;r<l&&(n.plot.layout.xaxis.range[0]=l,s=!0),i>a&&(n.plot.layout.xaxis.range[1]=a,s=!0)}(),l(),Plotly.redraw(n.plot)}))},i=0;return{registerButtonClick:function(t){t.addEventListener("click",(function(){e.call(this)}))},registerPlotRelayoutCallback:function(){n.plot.on("plotly_relayout",(function(e){i++,setTimeout((function(){--i<=0&&r()}),200)}))},toggleDatasetState:e}}();let f={createPlot:function(o){return new Promise(l=>{let a=o;if(null===a){a=function(e){let t=document.createElement("div"),o=document.createElement("div");return e.appendChild(t),e.appendChild(o),[t,o]}(document.getElementById(e))}let r=t.getInitialPlotLayout();!function(e){for(let t in e){let o=e[t].replace(/[^\x20-\x7E]/g,"");void 0===n.unit_to_axes[o]&&(n.unit_to_axes[o]=[]),n.unit_to_axes[o].push(t)}}(r[4]),n.axes.axisActiveCount=r[1],n.axes.axisTitles=r[2],n.axes.axisMap=r[3],r[0].annotations=r[2],r[0].shapes=[],console.log(a),Plotly.newPlot(a[0],[],r[0]).then((function(e){n.plot=e,c.registerPlotRelayoutCallback(),n.modebar=e.querySelector(".modebar-container"),l()}));for(let e in t.setupValues.defaultChartColors)n.datasetColors[e]=t.setupValues.defaultChartColors[e]})},registerButton:d,fetchGlobalSetup:t.fetchGlobalSetup};return{overWriteFunctions:l,registerButtons:function(e,t){o.queue.addToQueue(d,[e],t)},ajax:o.ajax,domUpdaters:o.DOMupdates,toggleDataSetState:c.toggleDatasetState,executeFunc:function(e,t){void 0!==f[e]&&o.queue.addToQueue(f[e],t)}}},a=function(){var e,t={},o=function(){let e={plotly:!1};if("undefined"==typeof Plotly)console.error("Could not find Plotly.js - download from https://github.com/plotly/plotly.js/");else if(void 0===Plotly.Plots||void 0===Plotly.Plots.allTypes)console.error("Invalid Plotly.js instance - Unable to find supported categories from Plotly.Plots.allTypes");else{let t={scatter:!1,histogram:!1},o={scatter:!1};for(let e=0;e<Plotly.Plots.allTypes.length;e++){let l=Plotly.Plots.allTypes[e];void 0!==t[l]&&(t[l]=!0,void 0!==o[l]&&(o[l]=!0))}let l=[];for(let e in o)!1===o[e]&&l.push(e);l.length>0?console.error("Could not find following required plot type(s): "+l.join(", ")):e.plotly=!0,e.plotTypes=t}return e};o();let a=function(t,n,a){(e=l()).setupValues.supportedPlotTypes=o().plotTypes,e.setRequestURL(t,n,a)};return{getInstance:function(o,l,r){let[i,s]=function(e){let t="plot",o=null;if("string"===typeof e)t=e;else if(Array.isArray(e)){let l=e[0].id;t=null!==l?l:e[0].parentElement.id,o=e}return[t,o]}(o);return e||a(null,l,r),void 0===t[i]&&(t[i]=function(e,t,o){let l=n(e,t);return l.executeFunc("fetchGlobalSetup",[]),l.executeFunc("createPlot",[o]),l}(i,e,s)),t[i]},getSetup:function(t,o){return e||a(null,t,o),e}}}();t.default=a}]).default;
+var plotlyTimeSeries =
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+// CONCATENATED MODULE: ./src/setup_holder.js
+var plotly_time_series_setup = function () {
+
+    let setupValues = {
+        setup_by_cat:{},
+        setup_by_code:{},
+        cat_by_code:{},
+        current_time: new Date(),
+        defaultHistogramSetup:{opacity:0.22},
+        defaultChartColors:{
+            "1f77b4": false,
+            "63b800": false,
+            "e15b00": false,
+            "000000": false,
+            "dcc539": false,
+            "8e3900": false,
+            "00b9e2": false,
+            "ff00e5": false,
+            "F0344F": false,
+        },
+        supportedPlotTypes: {scatter:false,histogram:false},
+    };
+
+    let overWriteFunctions = {
+        globalSetup: null,
+        setupByCode:null,
+        setupByCat:null
+    };
+
+    let setupTemaple = function(){
+        return {
+            'unit': '',
+            'unithtml':'',
+            'plot_type': 'scatter',
+            'normalize':false,
+            'groupnorm':null,
+            'yaxis': null,
+            'opacityMap':{},
+            'desc':''
+        }
+    };
+
+    let requestURLs = {
+        'default':[],
+        'plot':{}
+    };
+
+    let createUrl = function(plotid,code){
+        let url = requestURLs['default'];
+        if(plotid !== null && requestURLs['plot'][plotid] !== undefined){
+            url = requestURLs['plot'][plotid];
+        }
+        let params = url[1];
+        if(params === null)params=[];
+        params.push("req="+code);
+        params = params.join("&");
+        url = url[0]+"?"+params;
+        return url;
+    };
+
+    let fetchGlobalSetup = function (plotid) {
+        if(overWriteFunctions.globalSetup !== null) {
+            return new Promise((resolve, reject) => {
+                let ow = Promise.resolve(overWriteFunctions.globalSetup(setupValues));
+                ow.then(function () {
+                    resolve();
+                });
+            });
+        }
+        let url = createUrl(plotid,'global-setup');
+
+        $.ajax({
+            url: url,
+            method: "GET",
+            success: function (data) {
+                if(data.success){
+                    if(data.codesetup !== undefined){
+                        for (let d in data.codesetup){
+                            setupValues.setup_by_code[d] = data.codesetup[d];
+                        }
+                    }
+                    if(data.catsetup !== undefined){
+                        for (let d in data.catsetup){
+                            setupValues.setup_by_cat[d] = data.catsetup[d];
+                        }
+                    }
+                    if(data.codecat !== undefined){
+                        for (let d in data.codecat){
+                            setupValues.cat_by_code[d] = data.codecat[d];
+                        }
+                    }
+                } else {
+                    alert("Could not load setup");
+                }
+            }
+        });
+    };
+
+    let fetchSetupByCode = function (codes, plotid) {
+        if(!Array.isArray(codes)) codes = [codes];
+        if(overWriteFunctions.setupByCode !== null) {
+            return new Promise((resolve, reject) => {
+                let ow = Promise.resolve(overWriteFunctions.setupByCode(codes, plotid, setupValues));
+                ow.then(function () {
+                    for(let c=0;c<codes.length;c++){
+                        if(setupValues.setup_by_code[codes[c]] === undefined) setupValues.setup_by_code[codes[c]] = null;
+                    }
+                    resolve();
+                });
+            });
+        }
+        return new Promise((resolve, reject) => {
+            let url = createUrl(plotid);
+            $.ajax({
+                url: url,
+                method: "GET",
+                data:{
+                    codes:codes
+                },
+                success: function (data) {
+                    if(data.success){
+                        if(data.codesetup !== undefined){
+                            for (let d in data.codesetup){
+                                setupValues.setup_by_code[d] = data.codesetup[d];
+                            }
+                        }
+                    }
+                    if(data.codecat !== undefined){
+                        for (let d in data.codecat){
+                            setupValues.cat_by_code[d] = data.codecat[d];
+                        }
+                    }
+                    resolve();
+                },
+                error: function () {
+                    resolve();
+                }
+            });
+        });
+
+    };
+    let fetch_setup_by_cat = function () {
+
+    };
+
+    let findSetupForCode = function(code,ix){
+        let setup = setupTemaple();
+        if(setupValues.cat_by_code[code] !== undefined){
+            let cat = setupValues.cat_by_code[code];
+            if(setupValues.setup_by_cat[cat] !== undefined){
+                for (let s in setupValues.setup_by_cat[cat]){
+                    setup[s] = setupValues.setup_by_cat[cat][s];
+                }
+            }
+        }
+        if(setupValues.setup_by_code[code] !== undefined && setupValues.setup_by_code[code] !== null){
+            for(let s in setupValues.setup_by_code[code]){
+                setup[s] = setupValues.setup_by_code[code][s];
+            }
+        }
+        return setup;
+    };
+
+    async function getCodeSetup(code, plotid,ix) {
+        if(setupValues.setup_by_code[code] !== undefined){
+            return findSetupForCode(code,ix);
+        } else {
+            await fetchSetupByCode(code,plotid);
+            return findSetupForCode(code);
+        }
+    };
+
+    let setRequestUrl = function (plotId,action,params) {
+        if(plotId === null){
+            requestURLs['default'] = [action,params];
+        } else {
+            requestURLs['plot'][plotId] = [action,params];
+        }
+    };
+
+
+    let getInitialPlotLayout = function () {
+
+        var defGlobalPlotyAxisTypeUnits = {
+            "y_temp": "°C",
+            "y_percent": "SW",
+            "y_pres": "bar",
+            "y_presk": "kPa",
+            "y_tempdelta": "Δ°C",
+            "y_hour": "h",
+            "y_freq": "Hz",
+            "y_volume_ms": "m³/s",
+            "y_speed": "m/s",
+            "y_volume_ls": "L/s",
+            "y_volume_lh": "l/h",
+            "y_volume_mh": "m³/h",
+            "y_volume": "m³",
+            "y_power_k": "kW",
+            "y_power": "W",
+            "y_ppm": "ppm",
+            "y_ppb": "ppb",
+            "y_energy": "kWh",
+            "y_energy_wh": "Wh",
+            "y_eur": "EUR",
+            "y_rpm": "rpm",
+            "y_state": "St"
+        };
+
+        var specailAxisPref = {
+            "y_percent_stacked":{
+                range: [0, 100],
+                fixedrange: true
+            },
+            "y_percent":{
+                range: [0, 101],
+                fixedrange: true
+            },
+            "y_temp":{
+                rangemode: "normal"
+            },
+            "y_state":{
+                range: [0, 100],
+                fixedrange: true,
+                autorange: false,
+            }
+        };
+
+        var initialLayout = {
+            showlegend: false,
+            autosize: true,
+            responsive:true,
+            margin: {
+                b:8,
+                t:20,
+                l:40,
+                r:40,
+                pad:2
+            },
+            plot_bgcolor: "rgba(255,255,255,0)",
+            bargap: .05,
+            xaxis: {
+                domain: [0,0.9],
+                hoverformat: '%Y-%m-%d %H:%M',
+                tickformat: '%m-%d %H:%M',
+                tickformatstops: [
+                    {
+                        dtickrange: [86400000, 604800000],
+                        "value": "%m-%d"
+                    }, {
+                        dtickrange: [604800000, "M1"],
+                        "value": "%m-%d"
+                    },{
+                        dtickrange: ["M1", "M12"],
+                        value: "%Y-%m"
+                    },{
+                        dtickrange: ["M12", null],
+                        value: "%Y"
+                    }
+                ],
+                rangeslider: {},
+                type: "date",
+                calendar: "gregorian",
+                spikethickness:1,
+                showspikes:false,
+                range:[new Date(new Date().setDate(setupValues.current_time.getDate()-7)),setupValues.current_time]
+            },
+        };
+
+        let axesCount = 1;
+        let usedAxes = {};
+        var activeAxesCount = {};
+        var axisTitles = [];
+        for(let a in defGlobalPlotyAxisTypeUnits){
+            if(usedAxes[a] !== undefined) continue;
+            let axis = {
+                titlefont: {color: '#686868'},
+                tickfont: {color: '#668866'},
+                side: 'left',
+                showline: false,
+                showgrid: false,
+                zeroline: false,
+                showticklabels: false,
+                xaxis: 'x1',
+                rangemode: "tozero",
+                fixedrange: false,
+                hoverformat: '.2f',
+                hoverinfo: 'y+name',
+                spikethickness:1,
+                showspikes:false,
+                autorange: true,
+            };
+            let title = {
+                xref: 'paper',
+                yref: 'paper',
+                x: 0,
+                xanchor: 'right',
+                y: 1,
+                yanchor: 'bottom',
+                text: defGlobalPlotyAxisTypeUnits[a],
+                font:{
+                    size: 12,
+                    color: "rgba(0,0,0,0)"
+                },
+                showarrow: false
+            };
+            if(axesCount>1) axis['overlaying'] = 'y';
+            if(specailAxisPref[a] !== undefined){
+                for(let s in specailAxisPref[a]){
+                    axis[s] = specailAxisPref[a][s];
+                }
+            }
+            if(axesCount>1) {
+                title.axis = 'yaxis'+axesCount;
+                initialLayout['yaxis'+axesCount] = axis;
+                usedAxes[a] = axesCount;
+            }
+            else {
+                title.axis = 'yaxis';
+                initialLayout['yaxis'] = axis;
+                usedAxes[a] = "";
+            }
+            axisTitles.push(title);
+            activeAxesCount[a] = 0;
+            axesCount++;
+        }
+
+        return [initialLayout,activeAxesCount,axisTitles,usedAxes,defGlobalPlotyAxisTypeUnits];
+    };
+
+    return {
+        setupValues: setupValues,
+        requestURLs: requestURLs,
+        overWriteFunctions:overWriteFunctions,
+        setRequestURL: setRequestUrl,
+        getCodeSetup: getCodeSetup,
+        getInitialPlotLayout:getInitialPlotLayout,
+        fetchSetupByCode:fetchSetupByCode,
+        fetchGlobalSetup:fetchGlobalSetup,
+        getQueryUrl:createUrl
+    }
+};
+
+/* harmony default export */ var setup_holder = (plotly_time_series_setup);
+// CONCATENATED MODULE: ./src/main_plot.js
+var plotly_handler = function (plotid,setup_instance) {
+
+
+    let helpers = (function(){
+        let actionPromiseQueue = (function(){
+
+            let currentQueue = [];
+            let currentRun = false;
+
+            let addToQueue = function (functionName,params,thenFunc) {
+                currentQueue.push([functionName,params,thenFunc]);
+                if(currentRun === false){
+                    checkQueue();
+                }
+            };
+
+            var checkQueue = function () {
+                if(currentQueue.length > 0){
+                    currentRun = true;
+                    let next = currentQueue.shift();
+                    let result = next[0].apply(null, next[1]);
+                    var isPromise = result !== undefined && typeof result.then == 'function';
+                    if(isPromise){
+                        result.then(function () {
+                            if(next[2] !== undefined && typeof next[2] === "function"){
+                                next[2]();
+                            }
+                            checkQueue();
+                        });
+                    } else {
+                        if(next[2] !== undefined && typeof next[2] === "function"){
+                            next[2]();
+                        }
+                        checkQueue();
+                    }
+                } else {
+                    currentRun = false;
+                }
+            };
+
+            return {
+                addToQueue:addToQueue
+            }
+        })();
+
+
+        let dataFormatters = {
+            "JSON_PARSE": function (tagData) {
+                tagData.values = JSON.parse(tagData.values)
+            },
+            "TYPE_CONVERSION": function (tagData) {
+                for (let l = 0; l < tagData.values.length; l++) {
+                    //TODO: Remove conversion
+                    tagData.values[l][0] = (new Date(tagData.values[l][0]).getTime() / 1000);
+                    tagData.values[l][1] = parseFloat(tagData.values[l][1]).toFixed(2);
+                }
+            },
+            "CSV_SIMPLE": function (tagData) {
+                let curVals = tagData.values;
+                curVals = curVals.split("\n");
+                if(curVals.length >0){
+                    tagData.values = processCSVRows(curVals);
+                } else {
+                    tagData.values = [];
+                }
+            },
+            "CSV_W_HEADER": function (tagData) {
+                let curVals = tagData.values;
+                curVals = curVals.split("\n");
+                if(curVals.length >1){
+                    curVals.shift();
+                    tagData.values = processCSVRows(curVals);
+                } else {
+                    tagData.values = [];
+                }
+            },
+            "REMOVE_REPEATING_ROW":function (tagData) {
+                let newData = [];
+                let currentValue = null;
+                for (let l = 0; l < tagData.values.length; l++) {
+                    if(tagData.values[l][1] !== currentValue){
+                        newData.push(tagData.values[l]);
+                        currentValue = tagData.values[l][1];
+                    }
+                }
+                tagData.values = newData;
+            }
+        };
+
+
+        let processCSVRows = function(curVals){
+            for (let l = 0; l < curVals.length; l++) {
+                curVals[l] = curVals[l].split(",");
+                curVals[l] = [(new Date(curVals[l][0]).getTime() / 1000),parseFloat(curVals[l][1]).toFixed(2)];
+            }
+            return curVals;
+        };
+
+
+
+
+        var ajax = {};
+        ajax.x = function () {
+            if (typeof XMLHttpRequest !== 'undefined') {
+                return new XMLHttpRequest();
+            }
+            var versions = [
+                "MSXML2.XmlHttp.6.0",
+                "MSXML2.XmlHttp.5.0",
+                "MSXML2.XmlHttp.4.0",
+                "MSXML2.XmlHttp.3.0",
+                "MSXML2.XmlHttp.2.0",
+                "Microsoft.XmlHttp"
+            ];
+
+            var xhr;
+            for (var i = 0; i < versions.length; i++) {
+                try {
+                    xhr = new ActiveXObject(versions[i]);
+                    break;
+                } catch (e) {
+                }
+            }
+            return xhr;
+        };
+
+        ajax.send = function (url, method, data, callback,addHeaders) {
+            var x = ajax.x();
+            var query = [];
+            for (var key in data) {
+                query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+            }
+            if(method === "GET"){
+                url = url + (query.length ? '?' + query.join('&') : '');
+                data = "";
+            } else if (method === 'POST') {
+                data = query.join('&');
+            }
+
+            x.open(method, url, true);
+            x.onreadystatechange = function () {
+                if (x.readyState === 4) {
+                    callback(x.responseText)
+                }
+
+            };
+            if (method === 'POST') {
+                x.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            }
+            for(let h in addHeaders){
+                x.setRequestHeader(h, addHeaders[h]);
+            }
+            x.send(data)
+        };
+
+        ajax.get = function (url, data, callback, async) {
+            var query = [];
+            for (var key in data) {
+                query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+            }
+            ajax.send(url + (query.length ? '?' + query.join('&') : ''), callback, 'GET', null, async)
+        };
+
+        ajax.post = function (url, data, callback, async) {
+            var query = [];
+            for (var key in data) {
+                query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+            }
+            ajax.send(url, callback, 'POST', query.join('&'), async)
+        };
+
+
+
+        var findNewButtonColor = function (preferred) {
+            let color = null;
+            if(preferred !== undefined){
+                preferred = preferred.replace("#","");
+                if(plot_elements_state.datasetColors[preferred] === false){
+                    color = "#" + preferred;
+                    plot_elements_state.datasetColors[preferred] = true;
+                    return  color;
+                }
+            }
+            for (let col in plot_elements_state.datasetColors) {
+                if (plot_elements_state.datasetColors[col] === false) {
+                    color = "#" + col;
+                    plot_elements_state.datasetColors[col] = true;
+                    break;
+                }
+            }
+            return color;
+        };
+        var releaseButtonColor = function(col){
+            col = col.replace("#","");
+            plot_elements_state.datasetColors[col] = false;
+        };
+
+        let getRangeAsDate = function (range) {
+            let startDateTime = range[0];
+            let endDateTime = range[1];
+            if(typeof startDateTime === "string"){
+                startDateTime = new Date(startDateTime);
+            }
+            if(typeof endDateTime === "string"){
+                endDateTime = new Date(endDateTime);
+            }
+            return [startDateTime,endDateTime];
+        };
+
+        let setButtonStateByColor = function (dataState,color,code) {
+            if(color !== null){
+                dataState.visible = true;
+                dataState.color = color;
+                plot_elements_state.activeCodes[code] = true;
+                if(dataState.htmlelement !== undefined){
+                    DOMupdates.updateButtonState(dataState.htmlelement,true,color);
+                } else {
+                    DOMupdates.buttonStateUpdateCallback(code,true,color);
+                }
+
+            } else {
+                dataState.visible = false;
+                delete plot_elements_state.activeCodes[code];
+                if(dataState.htmlelement !== undefined){
+                    DOMupdates.updateButtonState(dataState.htmlelement,false,"transparent");
+                } else {
+                    DOMupdates.buttonStateUpdateCallback(code,false,"transparent");
+                }
+
+            }
+        };
+
+        let DOMupdates = {
+            updateButtonState: function(button,active,color){
+                button.style.backgroundColor = color;
+                if(active){
+                    button.classList.add("active");
+                } else {
+                    button.classList.remove("active");
+                }
+            },
+            buttonStateUpdateCallback: function (code,active,color) {
+
+            }
+        };
+
+        return {
+            queue:actionPromiseQueue,
+            dataFormatters:dataFormatters,
+            ajax:ajax,
+            findNewButtonColor:findNewButtonColor,
+            releaseButtonColor:releaseButtonColor,
+            getRangeAsDate:getRangeAsDate,
+            setButtonStateByColor:setButtonStateByColor,
+            DOMupdates:DOMupdates
+        }
+    })();
+
+
+    let overWriteFunctions = {
+        queryData:null
+    };
+
+
+    let plot_elements_state = {
+        'plot':{},
+        'elems':{},
+        'axes':{
+            axisActiveCount:{},
+            axisTitles:{},
+            axisMap:{}
+        },
+        shapeGroups:{},
+        datasetColors:{},
+        pendingSetup: [],
+        unit_to_axes:{},
+        timeformat: 'unix',
+        activeCodes: {},
+        modebar:{}
+    };
+
+    let createPlot = function(containers){
+
+        let createPlotElems = function(con){
+            let plotcont = document.createElement("div");
+            let legend = document.createElement("div");
+            con.appendChild(plotcont);
+            con.appendChild(legend);
+            return[plotcont,legend];
+        };
+
+        let populateUnitAxesMapping = function (ax_setup) {
+            for(let a in ax_setup){
+                let unit = ax_setup[a].replace(/[^\x20-\x7E]/g, "");
+                if(plot_elements_state.unit_to_axes[unit] === undefined) plot_elements_state.unit_to_axes[unit] = [];
+                plot_elements_state.unit_to_axes[unit].push(a);
+            }
+
+
+        };
+
+        return new Promise(resolve => {
+            let plotElems = containers;
+            if(plotElems === null){
+                let plotCont = document.getElementById(plotid);
+                plotElems = createPlotElems(plotCont);
+            }
+            let initialLayout = setup_instance.getInitialPlotLayout();
+            populateUnitAxesMapping(initialLayout[4]);
+            plot_elements_state.axes.axisActiveCount = initialLayout[1];
+            plot_elements_state.axes.axisTitles = initialLayout[2];
+            plot_elements_state.axes.axisMap = initialLayout[3];
+            initialLayout[0].annotations = initialLayout[2];
+            initialLayout[0].shapes = [];
+
+            Plotly.newPlot(plotElems[0], [], initialLayout[0]).then(function (p) {
+                plot_elements_state.plot = p;
+                interactions.registerPlotRelayoutCallback();
+                plot_elements_state.modebar = p.querySelector(".modebar-container");
+                resolve();
+            });
+
+            for(let c in setup_instance.setupValues.defaultChartColors){
+                plot_elements_state.datasetColors[c] = setup_instance.setupValues.defaultChartColors[c];
+            }
+        });
+    };
+
+
+    let plotAnnotations = (function () {
+        let defaultAnnotation = function () {
+            return {
+                id: '',
+                type: 'rect',
+                xref: 'x',
+                yref: 'y',
+                x0: 0,
+                y0: 0,
+                x1: setup_instance.setupValues.current_time,
+                y1: 2,
+                fillcolor: "#868686",
+                opacity: 0.5,
+                visible: false,
+                labeltext: "",
+                line: {
+                    width: 0
+                }
+            };
+        };
+
+        var toggleStateAnnotations = function (visible,code,color) {
+            if(plot_elements_state.shapeGroups[code] === undefined) return;
+            for(let a = 0;a<plot_elements_state.shapeGroups[code].length;a++){
+                plot_elements_state.shapeGroups[code][a].visible = visible;
+                plot_elements_state.shapeGroups[code][a].fillcolor = color;
+            }
+        };
+
+
+        var appendStateDataToPlot = function (k,onoff,mode) {
+
+            let cAnnots = plot_elements_state.shapeGroups[k];
+            let annot = null;
+            let copyValues = {};
+            if(cAnnots.length>0) {
+                annot = cAnnots[0];
+                copyValues = annot;
+            } else {
+                copyValues = defaultAnnotation();
+            }
+            let newAnnots = [];
+
+            let dataState = plot_elements_state.elems[k];
+            if(onoff.length>0){
+                onoff[0][0] = new Date(onoff[0][0]*1000);
+            }
+            for(let i=0;i<onoff.length;i++){
+                let num = parseInt(onoff[i][1]);
+                let opacity = dataState.opacityMap[num];
+                if(opacity === undefined) opacity = 0.04 + (num * 0.12);
+
+                let xMin = 0;
+                let xMax = null;
+                if (onoff[i][0] !== 0) xMin = onoff[i][0];
+                if (onoff[i + 1] !== undefined && onoff[i + 1][0] !== 0) {
+                    onoff[i + 1][0] = new Date(onoff[i+1][0]*1000);
+                    xMax = onoff[i + 1][0];
+                }
+                else xMax = plot_elements_state.plot.layout.xaxis.range[1];
+
+                let addAnnot = true;
+                if(mode === "prepend" && onoff[i + 1]===undefined && annot !== null){
+                    if(annot.opacity===opacity){
+                        addAnnot=false;
+                        annot.x0 = xMin;
+                    } else {
+                        xMax=annot.x0;
+                    }
+                }
+                let newannot = {
+                    id: 'state_'+k+"_"+i,
+                    type: 'rect',
+                    xref: 'x',
+                    yref: 'y'+plot_elements_state.axes.axisMap[dataState.yaxis],
+                    x0: xMin,
+                    y0: copyValues.y0,
+                    x1: xMax,
+                    y1: copyValues.y1,
+                    fillcolor: copyValues.fillcolor,
+                    opacity: opacity,
+                    visible: dataState.visible,
+                    line: {
+                        width: 0
+                    }
+                };
+                if(addAnnot)newAnnots.push(newannot);
+            }
+            if(mode === "prepend"){
+                for(let n=newAnnots.length-1;n>=0;n--){
+                    plot_elements_state.plot.layout.shapes.push(newAnnots[n]);
+                    plot_elements_state.shapeGroups[k].unshift(newAnnots[n]);
+                }
+            }
+            if(mode === "append"){
+                for(let n=0;n<newAnnots.length;n++){
+                    plot_elements_state.plot.layout.shapes.push(newAnnots[n]);
+                    plot_elements_state.shapeGroups[k].unshift(newAnnots[n]);
+                }
+            }
+        };
+
+        var getStateAnnotations = function (onOffData) {
+            var xMin, xMax, annots = [];
+            var yV = 0;
+            for (let k in onOffData){
+                if(onOffData.hasOwnProperty(k)){
+                    let onoff = onOffData[k].values;
+                    let dataState = plot_elements_state.elems[k];
+                    dataState.index = null;
+                    let color = "#868686";
+                    if (dataState.visible === true) {
+                        if(plot_elements_state.datasetColors["868686"] === undefined || plot_elements_state.datasetColors["868686"] === false){
+                            plot_elements_state.datasetColors["868686"] = true;
+                            color = "#868686";
+                        } else if (onoff.length > 0) {
+                            color = helpers.findNewButtonColor(dataState.color);
+                        }
+                        helpers.setButtonStateByColor(dataState,color,k);
+                    }
+                    if(onoff.length>0){
+                        onoff[0][0] = new Date(onoff[0][0]*1000);
+                    }
+                    for (var i = 0; i < onoff.length; i++) {
+                        xMin = 0;
+                        xMax = null;
+                        let num = parseInt(onoff[i][1]);
+                        if (onoff[i][0] !== 0) xMin = onoff[i][0];
+                        let nextVal = onoff[i + 1];
+                        if (nextVal !== undefined) {
+                            nextVal[0] = new Date(nextVal[0]*1000);
+                            xMax = nextVal[0];
+                        }
+                        else xMax = plot_elements_state.plot.layout.xaxis.range[1];
+                        let opacity = dataState.opacityMap[num];
+                        if(opacity === undefined) opacity = 0.04 + (num * 0.12);
+
+                        let annot = {
+                            id: 'state_'+k+"_"+i,
+                            type: 'rect',
+                            xref: 'x',
+                            yref: 'y'+plot_elements_state.axes.axisMap[dataState.yaxis],
+                            x0: xMin,
+                            y0: yV,
+                            x1: xMax,
+                            y1: yV+2,
+                            fillcolor: color,
+                            opacity: opacity,
+                            visible: dataState.visible,
+                            line: {
+                                width: 0
+                            }
+                        };
+                        annots.push(annot);
+
+                        if(plot_elements_state.shapeGroups[k]===undefined) plot_elements_state.shapeGroups[k] = [];
+                        plot_elements_state.shapeGroups[k].push(annot);
+                    }
+                    if (dataState.visible === true)  yV += 2;
+                }
+            }
+            return annots;
+        };
+
+        return {
+            getStateAnnotations:getStateAnnotations,
+            appendStateDataToPlot:appendStateDataToPlot,
+            toggleStateAnnotations:toggleStateAnnotations
+        }
+    })();
+
+
+    let pullPlotData = function(codes){
+
+        return new Promise((resolve, reject) => {
+            let composeRequestBody = function (codes) {
+
+                let [startDateTime,endDateTime] = helpers.getRangeAsDate(plot_elements_state.plot.layout.xaxis.range);
+
+                let startTime = parseInt(startDateTime.getTime() / 1000);
+                let endTime = parseInt(endDateTime.getTime() / 1000);
+
+                let rParams = {'codes':{}};
+                for (let c in codes) {
+                    let cd = codes[c];
+                    let state = plot_elements_state.elems[cd];
+                    let start = startTime;
+                    let end = endTime;
+
+                    if (state.index !== undefined && state.index !== null && state.index.length>0) {
+                        let dataset = plot_elements_state.plot.data[state.index[0]];
+                        let first = dataset.x[0];
+                        first = parseInt(first.getTime() / 1000);
+                        end = first;
+                    } else if(plot_elements_state.shapeGroups[cd] !== undefined && plot_elements_state.shapeGroups[cd].length>0){
+                        let elem = plot_elements_state.shapeGroups[cd][0];
+                        end = parseInt(elem.x0 / 1000);
+                    }
+                    if(start >= end) continue;
+                    if(state.group !== undefined){
+                        if(state.query_group !== undefined && state.query_group === true){
+                            rParams[state.group] = [start, end];
+                        } else {
+                            if(rParams[state.group] === undefined) rParams[state.group] = {};
+                            rParams[state.group][cd] = [start, end];
+                        }
+                    } else {
+                        rParams['codes'][cd] = [start, end];
+                    }
+
+                }
+                return rParams;
+            };
+            let requestPlotData = function(requestData){
+                return new Promise((resolve, reject) => {
+                    helpers.ajax.send(
+                        setup_instance.getQueryUrl(plotid,'time-data'),
+                        'POST',
+                        requestData,
+                        function (responseData) {
+                            resolve(responseData);
+                        }
+                    )
+                });
+            };
+
+            let cutDataFromEnd = function(data,target){
+                let len = data.length;
+                let cutPoint = len-1;
+                for(;cutPoint>=0;cutPoint-=10){
+                    if(data[cutPoint][0]<target) break;
+                }
+                let limit = 10;
+                if(cutPoint<=0){
+                    limit = 10 + cutPoint;
+                    cutPoint = 0;
+                } else if(cutPoint === len-1){
+                    return data;
+                }
+                for (let i=0;i<=limit;i++){
+                    if(data[cutPoint][0]>=target) break;
+                    cutPoint++;
+                }
+                data.splice(cutPoint);
+            };
+
+            let cutDataFromBeginning = function(data,target){
+                var cutPoint = 0;
+                for(;cutPoint<data.length;cutPoint+=10){
+                    if(data[cutPoint][0]>target) break;
+                }
+                let limit = 10;
+                if(cutPoint>=data.length-1){
+                    limit = 10-(cutPoint-data.length);
+                    cutPoint = data.length;
+                } else if(cutPoint===0){
+                    limit = 0;
+                    if(data[cutPoint][0]>target) cutPoint = -1;
+                }
+                for (let i=0;i<limit;i++){
+                    cutPoint--;
+                    if(data[cutPoint][0]<=target) break;
+                }
+                data.splice(0,cutPoint+1);
+            };
+
+            let formatData = function(responseData){
+                let  codesByType = [{},{}];
+                for(let cat in responseData){
+                    for(let code in responseData[cat]){
+                        let formatters = [];
+                        let state = plot_elements_state.elems[code];
+                        let valObj = {
+                            mode:'append',
+                            structure: (state.datastructure === undefined?'row':state.datastructure),
+                            values:[]
+                        };
+
+                        if(Array.isArray(responseData[cat][code])){
+                            valObj.values = responseData[cat][code];
+                        } else {
+                            valObj.values = responseData[cat][code].values;
+                            if(responseData[cat][code].format !== undefined)formatters = responseData[cat][code].format;
+                        }
+                        if(state.yaxis === "y_state" || state.isState === true){
+                            formatters.unshift("REMOVE_REPEATING_ROW");
+                        }
+                        for (let f = 0; f<formatters.length;f++){
+                            let fstr = formatters[f];
+                            if(helpers.dataFormatters[fstr] !== undefined && typeof helpers.dataFormatters[fstr] === "function"){
+                                helpers.dataFormatters[fstr](valObj);
+                            }
+                        }
+
+                        if(valObj.structure === 'row'){
+                            if(valObj.values.length > 0){
+                                let firstValue = valObj.values[0];
+                                let newFrom = firstValue[0];
+                                if(newFrom !== parseInt(newFrom)){
+                                    console.warn(code+': Time format after data formatters is not correct. Expected unix timestamp format');
+                                    continue;
+                                }
+                                let newTo = valObj.values[valObj.values.length-1][0];
+                                if(state.index !== undefined){
+                                    let dataset = plot_elements_state.plot.data[state.index[0]];
+                                    let currentData = dataset.x;
+                                    let len = currentData.length;
+                                    if(len > 0){
+                                        let existingFrom = currentData[0];
+                                        let existingTo   = currentData[len-1];
+                                        if(existingFrom>newFrom){
+                                            valObj.mode = "prepend";
+                                            if(newTo > existingFrom){
+                                                cutDataFromEnd(valObj.values,existingFrom)
+                                            }
+                                        } else {
+                                            if(newFrom < existingTo){
+                                                cutDataFromBeginning(valObj.values,existingTo)
+                                            }
+                                        }
+                                    }
+                                } else if(plot_elements_state.shapeGroups[code] !== undefined){
+                                    let len = plot_elements_state.shapeGroups[code].length;
+                                    if(len > 0){
+                                        let existingFrom = plot_elements_state.shapeGroups[code][0].x0;
+                                        let existingTo   = plot_elements_state.shapeGroups[code][len-1].x1;
+                                        if(existingFrom>newFrom){
+                                            valObj.mode = "prepend";
+                                            if(newTo > existingFrom){
+                                                cutDataFromEnd(valObj.values,existingFrom)
+                                            }
+                                        } else {
+                                            if(newFrom < existingTo){
+                                                cutDataFromBeginning(valObj.values,existingTo)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if(state.yaxis === "y_state" || state.isState === true){
+                            codesByType[1][code] = valObj;
+                        } else {
+                            codesByType[0][code] = valObj;
+                        }
+                    }
+                }
+
+                return codesByType;
+            };
+
+
+            let requestBody = composeRequestBody(codes);
+
+            let data = {};
+            if(overWriteFunctions.queryData !== null){
+                data = Promise.resolve(overWriteFunctions.queryData(requestBody));
+            } else {
+                data = requestPlotData();
+            }
+            data.then(function (values) {
+                let formatted = formatData(values);
+                resolve(formatted);
+
+            });
+        });
+
+    };
+
+
+    var processChartDataTrace = function (responseData,plotState,mode) {
+        let edata = [[],[]];
+        let vals = responseData.values;
+        let firstValue = [0,0];
+        if(plotState.normalize !== undefined && plotState.normalize !== false){
+
+        } else {
+            for (let r=0;r<vals[0].length;r++){
+                edata[0].push(new Date(parseInt(vals[0][r])*1000));
+            }
+            edata[1] = vals[1];
+        }
+        return [edata[0],edata[1]];
+    };
+
+    var processChartDataRow = function (responseData,plotState,mode) {
+        let edata = [[],[]];
+        let vals = responseData.values;
+        let missingValueAnnotation= [];
+        if(plotState.normalize !== undefined && plotState.normalize !== false){
+            let normTreshold = 600;
+            let normTresholdMax = normTreshold*2;
+            if(plotState.normalize !== true) normTreshold = plotState.normalize;
+            let dt = 0;
+            let prev = 0;
+            let firstValue = null;
+            let d=1;
+            if(vals.length>0){
+                dt = firstValue[0];
+                prev = firstValue[1];
+                if(mode === "prepend"){
+                    firstValue = vals[0];
+                }
+            }
+            if(mode === "append"){
+                if(plotState.index!==undefined){
+                    let dataset = plot_elements_state.plot.data[plotState.index[0]];
+                    if(dataset.length>0){
+                        dt =  dataset.x[dataset.x.length-1];
+                        prev = dataset.y[dataset.y.length-1];
+                    }
+                }
+                d=0;
+            }
+            for (;d<vals.length;d++){
+                let curdt = parseInt(vals[d][0]);
+                let timediff = curdt-dt;
+                if(timediff<normTreshold){
+                    continue;
+                }
+                if(timediff <= normTresholdMax){
+                    edata[0].push(new Date(curdt*1000));
+                    let diff = vals[d][1]-prev;
+                    edata[1].push(diff);
+                } else {
+                    missingValueAnnotation.push([dt,curdt]);
+                }
+                prev = vals[d][1];
+                dt = curdt;
+            }
+            if(mode === "prepend") {
+                if (plotState.index !== undefined && plotState.firstvalue !== undefined) {
+                    let fv = plotState.firstvalue;
+                    let timediff = fv[0] - dt;
+                    if (timediff <= normTresholdMax && timediff >= normTreshold) {
+                        edata[0].push(new Date(fv[0] * 1000));
+                        edata[1].push(fv[1] - prev);
+                    }
+                }
+                if (firstValue !== null) plotState.firstvalue = firstValue;
+            }
+        } else {
+            if(plotState.groupnorm !== null){
+                if(vals.length>0){
+                    let valLen = vals.length;
+                    let len = plotState.legend.length;
+                    edata[1] = new Array(len);
+                    for(let i=0;i<len;i++){
+                        edata[1][i] = new Array(valLen);
+                    }
+                    for (let r=0;r<valLen;r++){
+                        edata[0].push(new Date(parseInt(vals[r][0])*1000));
+                        for(let i=0;i<len;i++){
+                            edata[1][i][r] = vals[r][i+1];
+                            edata[1][i][r] = parseFloat(edata[1][i][r]);
+                        }
+                    }
+                }
+            } else {
+                for (let d = 0; d < vals.length; d++) {
+                    edata[0].push(new Date(parseInt(vals[d][0]) * 1000));
+                    edata[1].push(vals[d][1]);
+                    vals[d][1] = parseFloat(vals[d][1]);
+                }
+            }
+
+        }
+        return [edata[0],edata[1]];
+    };
+
+
+    var processChartData = function (responseData,plotState,mode) {
+        if(responseData.structure !== undefined && responseData.structure === "trace"){
+            return processChartDataTrace(responseData,plotState,mode);
+        } else {
+            return processChartDataRow(responseData,plotState,mode);
+        }
+    };
+
+    var toggleDatasetVisibility = function(visible,code,color){
+        let dataState = plot_elements_state.elems[code];
+        if(color !== undefined && dataState.index!==undefined){
+            let dataset = plot_elements_state.plot.data[dataState.index[0]];
+            dataset.line.color = color;
+            dataset.marker.color = color;
+        }
+        Plotly.restyle(plot_elements_state.plot,'visible',visible,dataState.index);
+    };
+
+
+    var setActiveAxes = function () {
+        let layout = plot_elements_state.plot.layout;
+        // annotations from axisTitles;
+        let annots = layout.annotations;
+        let annotsByid = {};
+        for(let i in annots){
+            annotsByid[annots[i].axis] = annots[i];
+        }
+        var showLogic = [];
+        for (let i in plot_elements_state.axes.axisActiveCount) {
+            if (plot_elements_state.axes.axisActiveCount[i] > 0) {
+                showLogic.push(i);
+            }
+            else {
+                let ax = "yaxis"+plot_elements_state.axes.axisMap[i];
+                layout[ax].showline = false;
+                layout[ax].showgrid = false;
+                layout[ax].showticklabels = false;
+                layout[ax].side = "right";
+                layout[ax].anchor = "x";
+                layout[ax].position = 0;
+                layout[ax].title.font.color = "rgba(0,0,0,0)";
+                annotsByid[ax].font.color = "rgba(0,0,0,0)";
+            }
+        }
+        for (let i = 0; i < showLogic.length; i++) {
+            var key = showLogic[i];
+            let ax = "yaxis"+plot_elements_state.axes.axisMap[key];
+            layout[ax].title.font.color = "#868686";
+
+            annotsByid[ax].font.color = "#868686";
+            if (i === 0) {
+                layout[ax].side = "left";
+                layout[ax].showline = true;
+                layout[ax].showgrid = true;
+                layout[ax].showticklabels = true;
+                annotsByid[ax].x=0;
+                annotsByid[ax].xref="paper";
+                annotsByid[ax].xanchor="right";
+            }
+            else {
+                layout[ax].showline = true;
+                layout[ax].showgrid = true;
+                layout[ax].showticklabels = true;
+                layout[ax].side = "right";
+                if(layout.xaxis.range!==undefined)annotsByid[ax].x=layout.xaxis.range[1];
+                else annotsByid[ax].x = (new Date()).getTime();
+                annotsByid[ax].xanchor="left";
+                let xpos = 0.87 + (i*0.03);
+                if(i>1){
+
+                    layout[ax].anchor = "free";
+                    layout[ax].position = xpos;
+                }
+                else layout[ax].anchor = "x";
+                annotsByid[ax].xref="paper";
+                annotsByid[ax].x=xpos;
+            }
+        }
+    };
+
+
+    var addNewDatasets = function (codes) {
+        return new Promise((resolve, reject) => {
+            if(codes.length === 0) resolve();
+            pullPlotData(codes).then(function (pres) {
+                let layout = plot_elements_state.plot.layout;
+                let storeData = pres[0];
+                let states     = pres[1];
+                var datasets = [];
+
+                for(let key in storeData){
+                    if(plot_elements_state.elems[key] !== undefined && plot_elements_state.elems[key].index !== undefined) continue;
+                    let plotState = plot_elements_state.elems[key];
+                    var color = plotState.fixedcolor;
+                    var yA = plotState.yaxis;
+                    let plottype = plotState.plot_type;
+                    let edata = processChartData(storeData[key],plotState,storeData[key].mode);
+                    if (yA === undefined || yA === null) yA = "y_temp";
+                    let desc = plotState.desc;
+
+                    if (plotState.visible === true) {
+                        if (color === null || color === "" || color === undefined) {
+                            color = helpers.findNewButtonColor(plotState.color);
+                        }
+                        helpers.setButtonStateByColor(plotState,color,key);
+                        if(plotState.visible) plot_elements_state.axes.axisActiveCount[yA]++;
+                    }
+
+                    if(plotState.groupnorm !== null){
+                        let legend = plotState.legend;
+                        let colors = [];
+                        if(legend !== undefined){
+                            for(let d=0;d<legend.length;d++){
+                                colors.push(legend[d][2]);
+                            }
+                        }
+                        if(colors.length>0){
+                            let cols = colors.join(",");
+                            colors = "linear-gradient(-45deg, "+cols+")";
+                        } else {
+                            colors = "#868686";
+                        }
+                        if(plotState.htmlelement !== undefined)plotState.htmlelement.setAttribute("bck-col",colors);
+
+                        for (let i=0;i<legend.length;i++){
+                            var dataset = {
+                                id: key+"_"+i,
+                                visible: plotState.visible,
+                                name: legend[i][0],
+                                x: edata[0],
+                                y: edata[1][i],
+                                yaxis: "y"+plot_elements_state.axes.axisMap[yA],
+                                marker: {
+                                    color: legend[i][1],
+                                    size: 2
+                                },
+                                line: {
+                                    color: legend[i][1],
+                                    width: 1
+                                },
+                                fillcolor: legend[i][1],
+                                mode: 'lines',
+                                type: plottype,
+                                stackgroup: key,
+                                xcalendar: "gregorian",
+                                ycalendar: "gregorian",
+                                plfirstvalue: edata[2],
+                            };
+                            dataset.groupnorm = plotState.groupnorm;
+                            datasets.push(dataset);
+                        }
+                    } else {
+                        var dataset = {
+                            id: key,
+                            visible: plotState.visible,
+                            name: desc,
+                            x: edata[0],
+                            y: edata[1],
+                            yaxis: "y"+plot_elements_state.axes.axisMap[yA],
+                            marker: {
+                                color: color,
+                                size: 2
+                            },
+                            line: {
+                                color: color,
+                                width: 1
+                            },
+                            mode: 'lines',
+                            type: plottype,
+                            xcalendar: "gregorian",
+                            ycalendar: "gregorian",
+                            plfirstvalue: edata[2]
+                        };
+                        let binSize = 3600000;
+                        if(plottype==="histogram"){
+                            dataset.autobiny = true;
+                            dataset.histfunc = "sum";
+                            dataset.marker.line = {
+                                color:dataset.marker.color,
+                                width:1
+                            };
+                            dataset.marker.opacity = setup_instance.setupValues.defaultHistogramSetup.opacity;
+                            dataset.xbins = {size:binSize};
+                            sharedBinningDataset[key] = dataset;
+                            if(layout.updatemenus === undefined) layout.updatemenus = updateMenus;
+                        }
+                        datasets.push(dataset);
+                    }
+
+                }
+
+                let shapes = plotAnnotations.getStateAnnotations(states);
+                plot_elements_state.plot.layout.shapes = plot_elements_state.plot.layout.shapes.concat(shapes);
+                setActiveAxes();
+                let index = plot_elements_state.plot.data.length;
+                Plotly.addTraces(plot_elements_state.plot,datasets);
+                for(;index<plot_elements_state.plot.data.length;index++){
+                    let id = plot_elements_state.plot.data[index].id;
+                    if(plot_elements_state.plot.data[index].stackgroup !== undefined) id = plot_elements_state.plot.data[index].stackgroup;
+                    if(plot_elements_state.elems[id].index === undefined) plot_elements_state.elems[id].index = [];
+                    plot_elements_state.elems[id].index.push(index);
+                }
+
+                resolve();
+            });
+        });
+    };
+
+    var appendDataToPlot = function(codes){
+        return new Promise((resolve, reject) => {
+            if(codes.length === 0) resolve();
+            pullPlotData(codes).then(function (pres) {
+                let storeData = pres[0];
+                let states     = pres[1];
+                let joinTraces = {
+                    append:[[],[],[],[]],
+                    prepend:[[],[],[],[]],
+                };
+                for(let key in storeData){
+                    let plotState = plot_elements_state.elems[key];
+                    let edata = processChartData(storeData[key],plotState,storeData[key].mode);
+                    if(plotState.groupnorm === null) {
+                        if (storeData[key].mode === "append") {
+                            joinTraces.append[0].push(edata[0]);
+                            joinTraces.append[1].push(edata[1]);
+                            joinTraces.append[2].push(plotState.index[0]);
+                        } else {
+                            joinTraces.prepend[0].push(edata[0]);
+                            joinTraces.prepend[1].push(edata[1]);
+                            joinTraces.prepend[2].push(plotState.index[0]);
+                        }
+                    }
+                }
+                if(joinTraces.append[0].length>0){
+                    Plotly.extendTraces(plot_elements_state.plot,{y: joinTraces.append[1],x:joinTraces.append[0]},joinTraces.append[2])
+                }
+                if(joinTraces.prepend[0].length>0){
+                    Plotly.prependTraces(plot_elements_state.plot,{y: joinTraces.prepend[1],x:joinTraces.prepend[0]},joinTraces.prepend[2])
+                }
+                for(let s in states){
+                    plotAnnotations.appendStateDataToPlot(s,states[s].values,states[s].mode)
+                }
+                resolve();
+            });
+        });
+    };
+
+    function processRegisterElements(elements){
+
+    }
+
+
+    async function registerButton(elements){
+        let activeButtons = [];
+        let axes = {};
+        let missingButtons = {};
+        if(elements.length === 0) return;
+        if(elements[0] instanceof HTMLElement) {
+            //When DOM nodes
+            for (let e = 0; e < elements.length; e++) {
+                let code = elements[e].getAttribute("pl-code");
+                let active = elements[e].classList.contains("active");
+                if (plot_elements_state.elems[code] === undefined) {
+                    plot_elements_state.pendingSetup.push(code);
+                    missingButtons[code] = elements[e];
+                } else {
+                    plot_elements_state.elems[code].htmlelement = elements[e];
+                }
+                if (active) {
+                    activeButtons.push(code);
+                }
+                let axis = elements[e].getAttribute("y-axis");
+                if (axis !== null) {
+                    axes[code] = axis;
+                }
+                interactions.registerButtonClick(elements[e]);
+            }
+        } else {
+            //When Object, do not register htmlelement
+            for (let e = 0; e < elements.length; e++) {
+                let code = elements[e].code;
+                let active = elements[e].active;
+                if (plot_elements_state.elems[code] === undefined) {
+                    plot_elements_state.pendingSetup.push(code);
+                }
+                if (active) {
+                    activeButtons.push(code);
+                }
+                let axis = elements[e].yaxis;
+                if (axis !== undefined) {
+                    axes[code] = axis;
+                }
+            }
+        }
+        if(plot_elements_state.pendingSetup.length>0){
+            await setup_instance.fetchSetupByCode(plot_elements_state.pendingSetup,plotid);
+            for(let p=0;p<plot_elements_state.pendingSetup.length;p++){
+                let code = plot_elements_state.pendingSetup[p];
+                plot_elements_state.elems[code] = await setup_instance.getCodeSetup(code,plotid);
+                if(missingButtons[code] !== undefined)plot_elements_state.elems[code].htmlelement = missingButtons[code];
+            }
+        }
+        activeButtons.forEach( code => plot_elements_state.elems[code].visible = true);
+        for(let code in axes){
+            plot_elements_state.elems[code].yaxis = axes[code];
+        }
+        plot_elements_state.pendingSetup = [];
+        addNewDatasets(activeButtons);
+        return Promise.resolve();
+    }
+
+    var interactions = (function () {
+
+        let toggleDatasetState = function (code) {
+            if(code === undefined) code = this.getAttribute("pl-code");
+            let plotState = plot_elements_state.elems[code];
+            if(plotState === undefined) {
+                console.warn("Invalid code in toggleDatasetState: "+code);
+                return;
+            }
+            if(plotState.visible){
+                if(plotState.yaxis === "y_state" || plotState.isState === true){
+                    plotAnnotations.toggleStateAnnotations(false,code);
+                }  else {
+                    toggleDatasetVisibility(false,code);
+
+                }
+                helpers.releaseButtonColor(plotState.color);
+                delete plot_elements_state.activeCodes[code];
+                plot_elements_state.axes.axisActiveCount[plotState.yaxis]--;
+                if(plotState.htmlelement !== undefined){
+                    helpers.DOMupdates.updateButtonState(plotState.htmlelement,false,"transparent");
+                } else {
+                    helpers.DOMupdates.buttonStateUpdateCallback(code,false,"transparent");
+                }
+                plotState.visible = false;
+                setActiveAxes();
+                Plotly.redraw(plot_elements_state.plot);
+            } else {
+                let color = plotState.fixedColor;
+                if(color === undefined || color === null){
+                    color = helpers.findNewButtonColor(plotState.color);
+                }
+                let isState = (plotState.yaxis === "y_state" || plotState.isState === true);
+                if(plotState.index === undefined){
+                    if(color !== undefined && color !== null){
+                        plotState.color = color;
+                        helpers.releaseButtonColor(plotState.color);
+                        plotState.visible = true;
+                        helpers.queue.addToQueue(addNewDatasets,[[code]]);
+                    }
+                } else {
+                    helpers.setButtonStateByColor(plotState,color,code);
+                    if (plotState.visible === false) return;
+                    plot_elements_state.axes.axisActiveCount[plotState.yaxis]++;
+                    if(isState){
+                        plotAnnotations.toggleStateAnnotations(true,code,color);
+                    } else {
+                        toggleDatasetVisibility(true,code,color);
+                        setActiveAxes();
+                        correctVisibleAxes();
+                        Plotly.redraw(plot_elements_state.plot);
+                    }
+                    helpers.queue.addToQueue(appendDataToPlot,[[code]],function () {
+                        Plotly.redraw(plot_elements_state.plot);
+                    });
+                }
+
+            }
+        };
+
+        let registerButtonClick = function (elem) {
+            elem.addEventListener("click",function () {
+                toggleDatasetState.call(this);
+            });
+        };
+
+        var prevXaxisRange = [null,null];
+        let checkDataPullConditions = function (range) {
+            if(prevXaxisRange === null){
+                prevXaxisRange = range;
+                return true;
+            }
+            let pullData = false;
+            if(prevXaxisRange[0] > range[0]) pullData = true;
+            if(prevXaxisRange[1] < range[1]) pullData = true;
+            prevXaxisRange = range;
+            return pullData;
+        };
+
+
+        let setXaxisRange = function () {
+            let xRange = helpers.getRangeAsDate(plot_elements_state.plot.layout.xaxis.range);
+            let dataSets = plot_elements_state.plot.data;
+            let allFirst = null;
+            let allLast = null;
+            for(let d in dataSets){
+                let len = dataSets[d].x.length;
+                if(len>0){
+                    let first = dataSets[d].x[0];
+                    let last = dataSets[d].x[len-1];
+                    if(allFirst === null || first < allFirst) allFirst = first;
+                    if(allLast === null || last > allLast) allLast = last;
+                }
+            }
+
+            let [startDateTime,endDateTime] = xRange;
+            let updateSlider = false;
+            if(startDateTime < allFirst){
+                plot_elements_state.plot.layout.xaxis.range[0] = allFirst;
+                updateSlider = true;
+            }
+            if(endDateTime > allLast){
+                plot_elements_state.plot.layout.xaxis.range[1] = allLast;
+                updateSlider = true;
+            }
+        };
+
+        let correctVisibleAxes = function () {
+            let cdata = plot_elements_state.plot.calcdata;
+            let exByAxis = {};
+            for(let c=0;c<cdata.length;c++){
+                let trace = cdata[c][0].trace;
+                if(trace.visible == false)continue;
+                let axis = trace.yaxis;
+                let extremes = trace._extremes[axis];
+                let min = extremes.min[0].val;
+                let max = extremes.max[0].val;
+                if(min !== undefined){
+                    if(exByAxis[axis] === undefined){
+                        exByAxis[axis] = [min,max];
+                    } else {
+                        if(exByAxis[axis] [0]>min) exByAxis[axis] [0] = min;
+                        if(exByAxis[axis] [1]<max) exByAxis[axis] [1] = max;
+                    }
+                }
+            }
+            let panMode = false;
+            let pan = plot_elements_state.modebar.querySelector(".modebar-btn[data-val='pan']");
+            if(pan !== null){
+                panMode = pan.classList.contains("active");
+            }
+            for (let ax in exByAxis){
+                let limit = exByAxis[ax];
+                let buffer = (limit[1]-limit[0])*0.05;
+                limit[0] = limit[0]-buffer;
+                limit[1] = limit[1]+buffer;
+                let y = ax.replace("y","");
+                let range = plot_elements_state.plot.layout["yaxis"+y].range;
+                if(panMode){
+                    if(range[0] < limit[0]) {
+                        let diff = range[1]-range[0];
+                        range[0] = limit[0];
+                        range[1] = (limit[0]+diff);
+                    }else if(range[1] > limit[1]) {
+                        let diff = range[1]-range[0];
+                        range[1] = limit[1];
+                        range[0] = (limit[1]-diff);
+                    }
+                } else {
+                    if(range[0] < limit[0]) range[0] = limit[0];
+                    if(range[1] > limit[1]) range[1] = limit[1];
+                }
+                if(range[0] > range[1]) range[1] = range[0]+buffer;
+            }
+        };
+
+        var handlePlotlyRelayout = function(){
+            let xRange = helpers.getRangeAsDate(plot_elements_state.plot.layout.xaxis.range);
+            let shouldPullData = checkDataPullConditions(xRange);
+            if(shouldPullData){
+                helpers.queue.addToQueue(appendDataToPlot,[(Object.keys(plot_elements_state.activeCodes))],function () {
+                    setXaxisRange();
+                    correctVisibleAxes();
+                    Plotly.redraw(plot_elements_state.plot);
+                });
+                return;
+            }
+
+        };
+
+        var relayoutCount = 0;
+        let registerPlotRelayoutCallback = function(){
+            plot_elements_state.plot.on('plotly_relayout',
+                function(eventdata){
+                    relayoutCount++;
+                    setTimeout(function () {
+                        relayoutCount--;
+                        if(relayoutCount<=0)handlePlotlyRelayout();
+                    },200)
+                });
+        };
+
+
+        return {
+            registerButtonClick:registerButtonClick,
+            registerPlotRelayoutCallback:registerPlotRelayoutCallback,
+            toggleDatasetState:toggleDatasetState
+        }
+    })();
+
+    let registerButtons = function(elements,whenDone){
+        helpers.queue.addToQueue(registerButton,[elements],whenDone);
+    };
+
+    let runFunctions = {
+        createPlot: createPlot,
+        registerButton: registerButton,
+        fetchGlobalSetup:setup_instance.fetchGlobalSetup,
+    };
+    return {
+        overWriteFunctions:overWriteFunctions,
+        registerButtons:registerButtons,
+        ajax:helpers.ajax,
+        domUpdaters:helpers.DOMupdates,
+        toggleDataSetState: interactions.toggleDatasetState,
+        executeFunc: function (fname,params) {
+            if(runFunctions[fname] !== undefined){
+                helpers.queue.addToQueue(runFunctions[fname],params);
+            }
+        }
+    };
+
+};
+
+/* harmony default export */ var main_plot = (plotly_handler);
+// CONCATENATED MODULE: ./src/plotly_builder.js
+
+
+
+var plotlyBuilder = (function () {
+    var plotinstance = {};
+    var setup;
+
+    var checkPlotlyInstance = function () {
+        let ret = {plotly:false};
+        if (typeof Plotly === "undefined"){
+            console.error("Could not find Plotly.js - download from https://github.com/plotly/plotly.js/");
+        } else if (Plotly.Plots === undefined || Plotly.Plots.allTypes === undefined) {
+            console.error("Invalid Plotly.js instance - Unable to find supported categories from Plotly.Plots.allTypes");
+        } else {
+            let types = {"scatter":false,"histogram":false};
+            let required = {"scatter":false};
+            for (let p=0;p < Plotly.Plots.allTypes.length;p++){
+                let cat = Plotly.Plots.allTypes[p];
+                if(types[cat] !== undefined){
+                    types[cat] = true;
+                    if(required[cat] !== undefined) required[cat] = true;
+                }
+            }
+            let missing = [];
+            for (let r in required){
+                if(required[r] === false){
+                    missing.push(r);
+                }
+            }
+            if(missing.length>0){
+                console.error("Could not find following required plot type(s): "+missing.join(", "));
+            } else {
+                ret.plotly = true;
+            }
+            ret.plotTypes = types;
+        }
+        return ret;
+    };
+    checkPlotlyInstance();
+
+    function createInstance(setup,plotid,elems) {
+        let object = main_plot(setup,plotid);
+        object.executeFunc("fetchGlobalSetup",[]);
+        object.executeFunc("createPlot",[elems]);
+        return object;
+    }
+
+    let parseplot = function (plot) {
+        let ptype = typeof plot;
+        let plotid = "plot";
+        let elems = null;
+        if(ptype === "string"){
+            plotid = plot;
+        } else if(Array.isArray(plot)){
+            let id = plot[0].id;
+            if(id !== null) plotid = id;
+            else {
+                plotid = plot[0].parentElement.id;
+            }
+            elems = plot;
+        }
+        return [plotid,elems];
+    };
+
+    let initSetup = function (plotid,action,params) {
+        setup = setup_holder();
+        setup.setupValues.supportedPlotTypes = (checkPlotlyInstance()).plotTypes;
+        setup.setRequestURL(plotid,action,params);
+    };
+
+    return {
+        getInstance: function (plot,action,params) {
+            let [plotid,elems] = parseplot(plot);
+            if (!setup) {
+                initSetup(null,action,params)
+            }
+            if(plotinstance[plotid] === undefined)plotinstance[plotid] = createInstance(plotid,setup,elems);
+            return plotinstance[plotid];
+        },
+        getSetup: function (action,params) {
+            if (!setup) {
+                initSetup(null,action,params)
+            }
+            return setup;
+        },
+    };
+})();
+
+/* harmony default export */ var plotly_builder = __webpack_exports__["default"] = (plotlyBuilder);
+
+/***/ })
+/******/ ])["default"];

@@ -11,11 +11,11 @@ var plotly_time_series_setup = function () {
             "63b800": false,
             "e15b00": false,
             "000000": false,
-            "0054af": false,
+            "dcc539": false,
             "8e3900": false,
             "00b9e2": false,
             "ff00e5": false,
-            "dcc539": false,
+            "F0344F": false,
         },
         supportedPlotTypes: {scatter:false,histogram:false},
     };
@@ -142,12 +142,14 @@ var plotly_time_series_setup = function () {
 
     };
 
-    let findSetupForCode = function(code){
+    let findSetupForCode = function(code,ix){
         let setup = setupTemaple();
         if(setupValues.cat_by_code[code] !== undefined){
             let cat = setupValues.cat_by_code[code];
             if(setupValues.setup_by_cat[cat] !== undefined){
-                setup = setupValues.setup_by_cat[cat];
+                for (let s in setupValues.setup_by_cat[cat]){
+                    setup[s] = setupValues.setup_by_cat[cat][s];
+                }
             }
         }
         if(setupValues.setup_by_code[code] !== undefined && setupValues.setup_by_code[code] !== null){
@@ -158,9 +160,9 @@ var plotly_time_series_setup = function () {
         return setup;
     };
 
-    async function getCodeSetup(code, plotid) {
+    async function getCodeSetup(code, plotid,ix) {
         if(setupValues.setup_by_code[code] !== undefined){
-            return findSetupForCode(code);
+            return findSetupForCode(code,ix);
         } else {
             await fetchSetupByCode(code,plotid);
             return findSetupForCode(code);

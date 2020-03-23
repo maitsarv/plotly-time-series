@@ -65,10 +65,13 @@ export class PlotlyTsLitelement extends LitElement {
         this.groups = new Map([]);
         this.buttonGroups = {};
         this.plotElement();
+        this.ix = 0;
     }
 
     async createButton(code,group,active,buttons){
-        let setup = await this.plotSetup.getCodeSetup(code,this.plotId);
+        this.ix++;
+        let ix = this.ix;
+        const setup = await this.plotSetup.getCodeSetup(code,this.plotId,ix);
         buttons.push(this.addButton(code,group,setup.desc,setup.unithtml,active,false));
     }
 
@@ -157,12 +160,12 @@ export class PlotlyTsLitelement extends LitElement {
         this.plotSetup.overWriteFunctions.setupByCode = function(codes,values){
         };
         let currentinstance = this;
-        let plotElem = this.shadowRoot.getElementById(this.plotId);
         let plotCont = this.querySelector(".plot-container");
         this.plotelem = plotlyTimeSeries.getInstance([plotCont,null]);
         this.plotelem.domUpdaters.buttonStateUpdateCallback = function(code,active,color){
             currentinstance.buttonColor(currentinstance.buttonGroups[code],code,color,active);
         };
+        var plotSetup = this.plotSetup;
         this.plotelem.overWriteFunctions.queryData = function(data){
             let generateDataInTimeFrame=function(value,start,end){
                 if(value === null) value = 0;
@@ -205,7 +208,8 @@ export class PlotlyTsLitelement extends LitElement {
                         } else {
                             vals[cat] = {};
                             for(let code in data[cat]){
-                                if(code === "t2"){
+                                let codesetup = test_setup.codecat[code];
+                                if(codesetup === "SW"){
                                     vals[cat][code] = {
                                         values: generateStateDataInTimeFrame(null, data[cat][code] [0], data[cat][code] [1])
                                     };

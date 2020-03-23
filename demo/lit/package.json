@@ -4,8 +4,7 @@
   "main": "plotly-ts-element.js",
   "dependencies": {
     "@polymer/polymer": "^3.0.0",
-    "lit-element": "^2.3.1",
-    "webpack-merge": "latest"
+    "lit-element": "^2.3.1"
   },
   "devDependencies": {
     "@open-wc/building-webpack": "^2.13.8",
@@ -17,7 +16,9 @@
     "wct-mocha": "^1.0.1",
     "webpack": "^4.20.2",
     "webpack-cli": "^3.1.2",
-    "webpack-shell-plugin": "^0.5.0"
+    "webpack-shell-plugin": "^0.5.0",
+    "webpack-merge": "latest",
+    "minimist": ">=1.2.2"
   },
   "scripts": {
     "build": "webpack --mode production"

@@ -313,7 +313,6 @@ var plotly_handler = function (plotid,setup_instance) {
             initialLayout[0].annotations = initialLayout[2];
             initialLayout[0].shapes = [];
 
-            console.log(plotElems);
             Plotly.newPlot(plotElems[0], [], initialLayout[0]).then(function (p) {
                 plot_elements_state.plot = p;
                 interactions.registerPlotRelayoutCallback();
@@ -437,13 +436,14 @@ var plotly_handler = function (plotid,setup_instance) {
                 if(onOffData.hasOwnProperty(k)){
                     let onoff = onOffData[k].values;
                     let dataState = plot_elements_state.elems[k];
+                    dataState.index = null;
                     let color = "#868686";
                     if (dataState.visible === true) {
                         if(plot_elements_state.datasetColors["868686"] === undefined || plot_elements_state.datasetColors["868686"] === false){
                             plot_elements_state.datasetColors["868686"] = true;
                             color = "#868686";
                         } else if (onoff.length > 0) {
-                            color = helpers.findNewButtonColor();
+                            color = helpers.findNewButtonColor(dataState.color);
                         }
                         helpers.setButtonStateByColor(dataState,color,k);
                     }
@@ -809,7 +809,7 @@ var plotly_handler = function (plotid,setup_instance) {
 
     var toggleDatasetVisibility = function(visible,code,color){
         let dataState = plot_elements_state.elems[code];
-        if(color !== undefined){
+        if(color !== undefined && dataState.index!==undefined){
             let dataset = plot_elements_state.plot.data[dataState.index[0]];
             dataset.line.color = color;
             dataset.marker.color = color;
@@ -901,7 +901,7 @@ var plotly_handler = function (plotid,setup_instance) {
 
                     if (plotState.visible === true) {
                         if (color === null || color === "" || color === undefined) {
-                            color = helpers.findNewButtonColor();
+                            color = helpers.findNewButtonColor(plotState.color);
                         }
                         helpers.setButtonStateByColor(plotState,color,key);
                         if(plotState.visible) plot_elements_state.axes.axisActiveCount[yA]++;
@@ -1142,20 +1142,31 @@ var plotly_handler = function (plotid,setup_instance) {
                 if(color === undefined || color === null){
                     color = helpers.findNewButtonColor(plotState.color);
                 }
-                helpers.setButtonStateByColor(plotState,color,code);
-                if (plotState.visible === false) return;
-                plot_elements_state.axes.axisActiveCount[plotState.yaxis]++;
-                if(plotState.yaxis === "y_state" || plotState.isState === true){
-                    plotAnnotations.toggleStateAnnotations(true,code,color);
+                let isState = (plotState.yaxis === "y_state" || plotState.isState === true);
+                if(plotState.index === undefined){
+                    if(color !== undefined && color !== null){
+                        plotState.color = color;
+                        helpers.releaseButtonColor(plotState.color);
+                        plotState.visible = true;
+                        helpers.queue.addToQueue(addNewDatasets,[[code]]);
+                    }
                 } else {
-                    toggleDatasetVisibility(true,code,color);
-                    setActiveAxes();
-                    correctVisibleAxes();
-                    Plotly.redraw(plot_elements_state.plot);
+                    helpers.setButtonStateByColor(plotState,color,code);
+                    if (plotState.visible === false) return;
+                    plot_elements_state.axes.axisActiveCount[plotState.yaxis]++;
+                    if(isState){
+                        plotAnnotations.toggleStateAnnotations(true,code,color);
+                    } else {
+                        toggleDatasetVisibility(true,code,color);
+                        setActiveAxes();
+                        correctVisibleAxes();
+                        Plotly.redraw(plot_elements_state.plot);
+                    }
+                    helpers.queue.addToQueue(appendDataToPlot,[[code]],function () {
+                        Plotly.redraw(plot_elements_state.plot);
+                    });
                 }
-                helpers.queue.addToQueue(appendDataToPlot,[[code]],function () {
-                    Plotly.redraw(plot_elements_state.plot);
-                });
+
             }
         };
 

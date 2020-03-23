@@ -50,11 +50,27 @@ export let test_setup = {
         t4:{
             'desc':'Some speed'
         },
+        t5:{
+            'desc':'What is this?'
+        },
+        t6:{
+            'desc':'More values'
+        },
+        t7:{
+            'desc':'A random number'
+        },
+        t8:{
+            'desc':'A random number2'
+        },
     },
     codecat:{
         't1':'C',
         't2':'SW',
         't3':'dC',
         't4':'mps',
+        't5':'dC',
+        't6':'C',
+        't7':'dC',
+        't8':'SW',
     }
 };
