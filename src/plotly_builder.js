@@ -64,7 +64,7 @@ var plotlyBuilder = (function () {
 
     let initSetup = function (plotid,action,params) {
         setup = plotly_setup();
-        setup.setupValues.supportedPlotTypes = (checkPlotlyInstance()).plotTypes;
+        setup.values.supportedPlotTypes = (checkPlotlyInstance()).plotTypes;
         setup.setRequestURL(plotid,action,params);
     };
 

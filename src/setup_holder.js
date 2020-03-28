@@ -1,10 +1,11 @@
 var plotly_time_series_setup = function () {
 
-    let setupValues = {
+    let values = {
         setup_by_cat:{},
         setup_by_code:{},
         cat_by_code:{},
         current_time: new Date(),
+        defaultXRange: [new Date(new Date().setDate(new Date().getDate()-7)),new Date()],
         defaultHistogramSetup:{opacity:0.22},
         defaultChartColors:{
             "1f77b4": false,
@@ -18,10 +19,11 @@ var plotly_time_series_setup = function () {
             "F0344F": false,
         },
         supportedPlotTypes: {scatter:false,histogram:false},
+        yAxisTicks: 6
     };
 
     let overWriteFunctions = {
-        globalSetup: null,
+        fetchGlobalSetup: null,
         setupByCode:null,
         setupByCat:null
     };
@@ -58,9 +60,9 @@ var plotly_time_series_setup = function () {
     };
 
     let fetchGlobalSetup = function (plotid) {
-        if(overWriteFunctions.globalSetup !== null) {
+        if(overWriteFunctions.fetchGlobalSetup !== null) {
             return new Promise((resolve, reject) => {
-                let ow = Promise.resolve(overWriteFunctions.globalSetup(setupValues));
+                let ow = Promise.resolve(overWriteFunctions.fetchGlobalSetup(values));
                 ow.then(function () {
                     resolve();
                 });
@@ -75,17 +77,17 @@ var plotly_time_series_setup = function () {
                 if(data.success){
                     if(data.codesetup !== undefined){
                         for (let d in data.codesetup){
-                            setupValues.setup_by_code[d] = data.codesetup[d];
+                            values.setup_by_code[d] = data.codesetup[d];
                         }
                     }
                     if(data.catsetup !== undefined){
                         for (let d in data.catsetup){
-                            setupValues.setup_by_cat[d] = data.catsetup[d];
+                            values.setup_by_cat[d] = data.catsetup[d];
                         }
                     }
                     if(data.codecat !== undefined){
                         for (let d in data.codecat){
-                            setupValues.cat_by_code[d] = data.codecat[d];
+                            values.cat_by_code[d] = data.codecat[d];
                         }
                     }
                 } else {
@@ -99,10 +101,10 @@ var plotly_time_series_setup = function () {
         if(!Array.isArray(codes)) codes = [codes];
         if(overWriteFunctions.setupByCode !== null) {
             return new Promise((resolve, reject) => {
-                let ow = Promise.resolve(overWriteFunctions.setupByCode(codes, plotid, setupValues));
+                let ow = Promise.resolve(overWriteFunctions.setupByCode(codes, plotid, values));
                 ow.then(function () {
                     for(let c=0;c<codes.length;c++){
-                        if(setupValues.setup_by_code[codes[c]] === undefined) setupValues.setup_by_code[codes[c]] = null;
+                        if(values.setup_by_code[codes[c]] === undefined) values.setup_by_code[codes[c]] = null;
                     }
                     resolve();
                 });
@@ -120,13 +122,13 @@ var plotly_time_series_setup = function () {
                     if(data.success){
                         if(data.codesetup !== undefined){
                             for (let d in data.codesetup){
-                                setupValues.setup_by_code[d] = data.codesetup[d];
+                                values.setup_by_code[d] = data.codesetup[d];
                             }
                         }
                     }
                     if(data.codecat !== undefined){
                         for (let d in data.codecat){
-                            setupValues.cat_by_code[d] = data.codecat[d];
+                            values.cat_by_code[d] = data.codecat[d];
                         }
                     }
                     resolve();
@@ -144,24 +146,24 @@ var plotly_time_series_setup = function () {
 
     let findSetupForCode = function(code,ix){
         let setup = setupTemaple();
-        if(setupValues.cat_by_code[code] !== undefined){
-            let cat = setupValues.cat_by_code[code];
-            if(setupValues.setup_by_cat[cat] !== undefined){
-                for (let s in setupValues.setup_by_cat[cat]){
-                    setup[s] = setupValues.setup_by_cat[cat][s];
+        if(values.cat_by_code[code] !== undefined){
+            let cat = values.cat_by_code[code];
+            if(values.setup_by_cat[cat] !== undefined){
+                for (let s in values.setup_by_cat[cat]){
+                    setup[s] = values.setup_by_cat[cat][s];
                 }
             }
         }
-        if(setupValues.setup_by_code[code] !== undefined && setupValues.setup_by_code[code] !== null){
-            for(let s in setupValues.setup_by_code[code]){
-                setup[s] = setupValues.setup_by_code[code][s];
+        if(values.setup_by_code[code] !== undefined && values.setup_by_code[code] !== null){
+            for(let s in values.setup_by_code[code]){
+                setup[s] = values.setup_by_code[code][s];
             }
         }
         return setup;
     };
 
     async function getCodeSetup(code, plotid,ix) {
-        if(setupValues.setup_by_code[code] !== undefined){
+        if(values.setup_by_code[code] !== undefined){
             return findSetupForCode(code,ix);
         } else {
             await fetchSetupByCode(code,plotid);
@@ -261,7 +263,7 @@ var plotly_time_series_setup = function () {
                 calendar: "gregorian",
                 spikethickness:1,
                 showspikes:false,
-                range:[new Date(new Date().setDate(setupValues.current_time.getDate()-7)),setupValues.current_time]
+                range:[new Date(values.defaultXRange[0].valueOf()),new Date(values.defaultXRange[1].valueOf())]
             },
         };
 
@@ -286,7 +288,8 @@ var plotly_time_series_setup = function () {
                 hoverinfo: 'y+name',
                 spikethickness:1,
                 showspikes:false,
-                autorange: true,
+                autorange: false,
+                nticks: values.yAxisTicks
             };
             let title = {
                 xref: 'paper',
@@ -327,7 +330,7 @@ var plotly_time_series_setup = function () {
     };
 
     return {
-        setupValues: setupValues,
+        values: values,
         requestURLs: requestURLs,
         overWriteFunctions:overWriteFunctions,
         setRequestURL: setRequestUrl,
