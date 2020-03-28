@@ -976,7 +976,6 @@ var plotly_handler = function (plotid,setup_instance) {
             let composeRequestBody = function (codes) {
 
                 let [startDateTime,endDateTime] = helpers.getRangeAsDate(plot_elements_state.plot.layout.xaxis.range);
-                console.log(startDateTime,endDateTime,setup_instance.values.defaultXRange);
                 if(startDateTime > setup_instance.values.defaultXRange[0]) startDateTime = new Date(setup_instance.values.defaultXRange[0].valueOf());
                 if(endDateTime < setup_instance.values.defaultXRange[1]) endDateTime =  new Date(setup_instance.values.defaultXRange[1].valueOf());
                 let startTime = parseInt(startDateTime.getTime() / 1000);
@@ -1398,6 +1397,7 @@ var plotly_handler = function (plotid,setup_instance) {
     var setActiveAxes = function (directUpdate) {
         let layout = plot_elements_state.plot.layout;
         let layoutUpdate = {};
+        let updateCt = 0;
         if(directUpdate) layoutUpdate = layout;
         // annotations from axisTitles;
         let annots = layout.annotations;
@@ -1413,6 +1413,7 @@ var plotly_handler = function (plotid,setup_instance) {
             else {
                 let ax = "yaxis"+plot_elements_state.axes.axisMap[i];
                 if(layout[ax].showline !== false){
+                    updateCt++;
                     layoutUpdate[ax] = layout[ax];
                     layoutUpdate[ax].showline = false;
                     layoutUpdate[ax].zeroline = false;
@@ -1429,35 +1430,47 @@ var plotly_handler = function (plotid,setup_instance) {
         for (let i = 0; i < showLogic.length; i++) {
             var key = showLogic[i];
             let ax = "yaxis"+plot_elements_state.axes.axisMap[key];
-            layoutUpdate[ax] = layout[ax];
-            layoutUpdate[ax].title = {font:{color:"#888888"}};
+            let curView = {
+                showline: layout[ax].showline,
+                side: layout[ax].side,
+                position: layout[ax],
+            };
+            let layOutItem = layout[ax];
+
+            layOutItem = layout[ax];
+            layOutItem.title = {font:{color:"#888888"}};
 
             annotsByid[ax].font.color = "#888888";
             if (i === 0) {
-                layoutUpdate[ax].side = "left";
-                layoutUpdate[ax].showline = true;
-                layoutUpdate[ax].showgrid = true;
-                layoutUpdate[ax].showticklabels = true;
+                layOutItem.side = "left";
+                layOutItem.showline = true;
+                layOutItem.showgrid = true;
+                layOutItem.showticklabels = true;
                 annotsByid[ax].x=0;
                 annotsByid[ax].xref="paper";
                 annotsByid[ax].xanchor="right";
+                if(curView.showline !== true || curView.side !== "left") layoutUpdate[ax] = layOutItem;
             }
             else {
-                layoutUpdate[ax].showline = true;
-                layoutUpdate[ax].showgrid = true;
-                layoutUpdate[ax].showticklabels = true;
-                layoutUpdate[ax].side = "right";
+                layOutItem.showline = true;
+                layOutItem.showgrid = true;
+                layOutItem.showticklabels = true;
+                layOutItem.side = "right";
                 if(layout.xaxis.range!==undefined)annotsByid[ax].x=layout.xaxis.range[1];
                 else annotsByid[ax].x = (new Date()).getTime();
                 annotsByid[ax].xanchor="left";
                 let xpos = 0.87 + (i*0.03);
                 if(i>1){
-                    layoutUpdate[ax].anchor = "free";
-                    layoutUpdate[ax].position = xpos;
+                    layOutItem.anchor = "free";
+                    layOutItem.position = xpos;
                 }
-                else layoutUpdate[ax].anchor = "x";
+                else layOutItem.anchor = "x";
                 annotsByid[ax].xref="paper";
                 annotsByid[ax].x=xpos;
+                if(curView.showline !== true || curView.side !== "right" || curView.position !== xpos) {
+                    updateCt++;
+                    layoutUpdate[ax] = layOutItem;
+                }
             }
         }
         return layoutUpdate;
@@ -1759,7 +1772,12 @@ var plotly_handler = function (plotid,setup_instance) {
                 }
                 datasetState.visible = false;
                 layout_update = setActiveAxes(false);
-                Plotly.update(plot_elements_state.plot,data_update,layout_update,datasetState.index[0]);
+                if(isState){
+                    layout_update.shapes = plot_elements_state.plot.layout.shapes;
+                    Plotly.relayout(plot_elements_state.plot,layout_update);
+                } else {
+                    Plotly.update(plot_elements_state.plot,data_update,layout_update,datasetState.index[0]);
+                }
             } else {
                 let color = datasetState.fixedcolor;
                 if(color === undefined || color === null){
@@ -2002,35 +2020,52 @@ var plotly_handler = function (plotid,setup_instance) {
             return hasUpdates;
         };
 
-        var handlePlotlyRelayout = function(){
+        var handlePlotlyRelayout = function(affectedItems){
             let xRange = helpers.getRangeAsDate(plot_elements_state.plot.layout.xaxis.range);
             let shouldPullData = checkDataPullConditions(xRange);
             if(shouldPullData){
                 helpers.queue.addToQueue(appendDataToPlot,[(Object.keys(plot_elements_state.activeCodes))],function () {
                     let layout_update = {};
-                    setXaxisRange(layout_update);
-                    correctVisibleAxes(layout_update);
+                    if(affectedItems['xaxis'] === true) setXaxisRange(layout_update);
+                    if(affectedItems['yaxis'] === true) correctVisibleAxes(layout_update);
                     Plotly.relayout(plot_elements_state.plot,layout_update);
                 });
                 return;
             } else {
-                let layout_update = {};
-                let hasUpdates = correctVisibleAxes(layout_update);
-                if(hasUpdates) Plotly.relayout(plot_elements_state.plot,layout_update);
+                if(affectedItems['yaxis'] === true){
+                    let layout_update = {};
+                    let hasUpdates = correctVisibleAxes(layout_update);
+                    if(hasUpdates) Plotly.relayout(plot_elements_state.plot,layout_update);
+                }
             }
 
         };
 
         var relayoutCount = 0;
         let registerPlotRelayoutCallback = function(){
+            let affectedItems = {};
             plot_elements_state.plot.on('plotly_relayout',
                 function(eventdata){
                     relayoutCount++;
+                    let time = 10;
+                    for (let e in eventdata){
+                        if(e.includes("yaxis")){
+                            affectedItems["yaxis"] = true;
+                            time = 10;
+                        } else {
+                            if(e.includes("xaxis")){
+                                affectedItems["xaxis"] = true;
+                                time = 200;
+                            }
+                        }
+                    }
                     setTimeout(function () {
                         relayoutCount--;
-                        if(relayoutCount<=0)handlePlotlyRelayout();
-                    },200)
-                    console.log("E",eventdata);
+                        if(relayoutCount<=0){
+                            handlePlotlyRelayout(affectedItems);
+                            affectedItems = {};
+                        }
+                    },time)
                 });
 
         };
