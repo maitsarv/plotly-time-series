@@ -46,7 +46,7 @@ Here is the basic flow of the library to make the setup requirements understanda
     
 ## Set up
 The main setup should be changed before the plot is initialized. 
-For most uses cases only setup fetching functions should be overwritten:
+For most uses cases only setup and data fetching functions should be overwritten:
 ```
     let plotSetup = plotlyTimeSeries.getSetup("plot/info",null);
     plotSetup.overWriteFunctions.fetchGlobalSetup = function (setupValues) {
